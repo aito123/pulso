@@ -1,0 +1,10 @@
+pandoc: 2.7.3
+pkgdown: 2.0.2
+pkgdown_sha: ~
+articles:
+  introduccion: introduccion.html
+last_built: 2022-02-18T22:48Z
+urls:
+  reference: https://aito123.github.io/pulso/reference
+  article: https://aito123.github.io/pulso/articles
+
