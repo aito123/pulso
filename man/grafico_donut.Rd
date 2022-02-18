@@ -18,6 +18,8 @@ Un grafico donut
 Funcion para realizar un grafico de barra apilada de n variables.
 }
 \examples{
+\dontrun{
 base \%>\% 
   grafico_donut(q0021)
+}
 }

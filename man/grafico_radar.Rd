@@ -58,6 +58,7 @@ Un grafico radar
 Funcion para realizar un grafico radar
 }
 \examples{
+\dontrun{
 radar \%>\% 
   select(group, Becas, `AtenciÃ³n socio- econÃ³mica`, Empleabilidad, `TutorÃ­as`) \%>\% 
   grafico_radar(polygonfill = FALSE,
@@ -77,4 +78,5 @@ radar \%>\%
         ) +
   guides(color=guide_legend(nrow = 2, byrow = TRUE)) +
   coord_equal(clip="off")
+}
 }

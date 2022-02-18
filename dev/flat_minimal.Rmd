@@ -7,9 +7,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Grafico de barras simple
+## Funciones de Pulso PUCP
 
-Funcion para realizar un grafico de barras simple.
+Este paquete fue creado por Santiago Sotelo.
 
 ```{r development, include=FALSE}
 library(testthat)
@@ -107,11 +107,13 @@ barra_simple<- function(data, var, ordenado=TRUE, max.limit=1, color = "#B0D597"
 
 ```
 
-```{r examples-barra_simple}
+```{r examples-barra_simple, eval=FALSE}
+#' \dontrun{
 base %>% 
   barra_simple(q0010)
 
 barra_simple(base, q0010)
+#' }
 ```
 
 ```{r tests-barra_simple}
@@ -197,10 +199,12 @@ barra_multiple<-function(data, ..., subtitulo = "", abierta=nombres, max.limit=1
 
 ```
 
-```{r examples-barra_multiple}
+```{r examples-barra_multiple, eval=FALSE}
+#' \dontrun{
 base %>% 
   filter(q0002 %in% 1) %>% 
   barra_multiple(starts_with("q0004_0"))
+#' }
 ```
 
 ```{r tests-barra_multiple}
@@ -359,10 +363,12 @@ barra_apilada_1<-function(data, var){
 
 ```
 
-```{r examples-barra_apilada_1}
+```{r examples-barra_apilada_1, eval=FALSE}
+#' \dontrun{
 base %>% 
   filter(q0002 %in% 1) %>% 
   barra_apilada_1(q0003_0002)
+#' }
 ```
 
 ```{r tests-barra_apilada_1}
@@ -534,9 +540,11 @@ barra_apilada_n<-function(data, ..., ordenado=TRUE){
 
 ```
 
-```{r examples-barra_apilada_n}
+```{r examples-barra_apilada_n, eval=FALSE}
+#' \dontrun{
 base %>% 
-  barra_apilada_n(?starts_with("q0011_"))
+  barra_apilada_n(starts_with("q0011_"))
+#' }
 ```
 
 ```{r tests-barra_apilada_n}
@@ -611,9 +619,11 @@ grafico_donut<- function(data, var, paleta=1, direction=1) {
 
 ```
 
-```{r examples-grafico_donut}
+```{r examples-grafico_donut, eval=FALSE}
+#' \dontrun{
 base %>% 
   grafico_donut(q0021)
+#' }
 ```
 
 ```{r tests-grafico_donut}
@@ -1141,7 +1151,8 @@ grafico_radar<- function (plot.data, base.size = 20, webtype = "mini",
 
 ```
 
-```{r examples-grafico_radar}
+```{r examples-grafico_radar, eval=FALSE}
+#' \dontrun{
 radar %>% 
   select(group, Becas, `Atención socio- económica`, Empleabilidad, `Tutorías`) %>% 
   grafico_radar(polygonfill = FALSE,
@@ -1161,6 +1172,7 @@ radar %>%
         ) +
   guides(color=guide_legend(nrow = 2, byrow = TRUE)) +
   coord_equal(clip="off")
+#' }
 ```
 
 ```{r tests-grafico_radar}

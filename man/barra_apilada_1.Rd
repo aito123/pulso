@@ -18,7 +18,9 @@ Un grafico de barra apilado
 Funcion para realizar un grafico de barra apilada de 1 variable.
 }
 \examples{
+\dontrun{
 base \%>\% 
   filter(q0002 \%in\% 1) \%>\% 
   barra_apilada_1(q0003_0002)
+}
 }

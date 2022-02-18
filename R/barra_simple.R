@@ -9,10 +9,12 @@
 #' @importFrom sjlabelled as_label
 #' @return Un grafico de barras simple.
 #' @examples
+#' \dontrun{
 #' base %>% 
 #'   barra_simple(q0010)
 #' 
 #' barra_simple(base, q0010)
+#' }
 #' @export
 
 barra_simple<- function(data, var, ordenado=TRUE, max.limit=1, color = "#B0D597", ultimo=NULL){

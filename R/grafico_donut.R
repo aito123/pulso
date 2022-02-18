@@ -8,8 +8,10 @@
 #' @importFrom sjlabelled as_label
 #' @return Un grafico donut
 #' @examples
+#' \dontrun{
 #' base %>% 
 #'   grafico_donut(q0021)
+#' }
 #' @export
 
 grafico_donut<- function(data, var, paleta=1, direction=1) {

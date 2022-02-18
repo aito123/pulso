@@ -27,7 +27,9 @@ Un grafico de barras mÃºltiple
 Funcion para realizar un grafico de barras multiple
 }
 \examples{
+\dontrun{
 base \%>\% 
   filter(q0002 \%in\% 1) \%>\% 
   barra_multiple(starts_with("q0004_0"))
+}
 }

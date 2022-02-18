@@ -25,8 +25,10 @@ Un grafico de barras simple.
 Funcion para realizar un grafico de barras simple.
 }
 \examples{
+\dontrun{
 base \%>\% 
   barra_simple(q0010)
 
 barra_simple(base, q0010)
+}
 }
