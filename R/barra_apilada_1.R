@@ -54,7 +54,7 @@ barra_apilada_1<-function(data, var){
                   nombres = as.character(nombres)) %>%
 
     full_join(labels) %>%
-    mutate(across(everything(), ~replace_na(.,0))) %>%
+    mutate(across(where(is.numeric()), ~replace_na(.,0))) %>%
 
     mutate(
 
