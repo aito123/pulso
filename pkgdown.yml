@@ -3,8 +3,5 @@ pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
   introduccion: introduccion.html
-last_built: 2022-02-18T23:21Z
-urls:
-  reference: https://aito123.github.io/pulso/reference
-  article: https://aito123.github.io/pulso/articles
+last_built: 2022-02-19T03:49Z
 
