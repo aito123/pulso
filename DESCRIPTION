@@ -2,25 +2,23 @@ Package: pulso
 Title: Funciones Para Los Informes Pulso PUCP
 Version: 0.0.0.9000
 Authors@R: 
-    person("Santiago", "Sotelo", , "santiago.sotelo@pucp.edu.pe", role = c("aut", "cre"))
+    person("Santiago", "Sotelo", , "santiago.sotelo@pucp.edu.pe", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9739-9964"))
 Description: Conjunto de funciones para los informes de Pulso PUCP.
-License: MIT + file LICENSE
-URL: https://github.com/aito123/pulso,
-    https://aito123.github.io/pulso/
-BugReports: https://github.com/aito123/pulso/issues
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
 Imports: 
     dplyr,
     ggplot2,
     glue,
     lazyeval,
+    magrittr,
     scales,
     sjlabelled
 Suggests: 
     knitr,
     rmarkdown,
     testthat
-VignetteBuilder: 
-    knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2

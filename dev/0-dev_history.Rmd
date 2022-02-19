@@ -1,9 +1,29 @@
 ---
 title: "Development actions history"
+author: "Santiago Sotelo"
 output: html_document
 editor_options: 
   chunk_output_type: console
 ---
+
+```{r development, include=FALSE}
+library(testthat)
+#Paquetes necesarios
+pacman::p_load(#data tools
+                tidyverse, janitor, glue, lubridate, scales, Hmisc,lazyeval,
+                #Gráficos
+                plotly, ggrepel, cowplot, grid, fmsb, 
+                #importar / exportar
+                haven, rio, officer, officedown,
+                #Etiquetas
+                sjlabelled,
+                #tablas
+                flextable, knitr, kableExtra, DT, gtsummary,
+                #Temas
+                ggpubr,
+                #Colores
+                paletteer, RColorBrewer)
+```
 
 All commands that you use to use when developing packages...
 
@@ -16,11 +36,13 @@ All commands that you use to use when developing packages...
 fusen::fill_description(
   pkg = here::here(),
   fields = list(
+    Package = "pulso",
     Title = "Funciones para los informes Pulso PUCP",
     Description = "Conjunto de funciones para los informes de Pulso PUCP",
     `Authors@R` = c(
-      person("Santiago", "Sotelo", email = "santiago.sotelo@pucp.edu.pe", role = c("aut", "cre"))
-    )
+      person("Santiago", "Sotelo", email = "santiago.sotelo@pucp.edu.pe", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9739-9964"))
+    ),
+    Language =  "es",
   ), overwrite = TRUE
 )
 # Define License with use_*_license()
