@@ -45,8 +45,10 @@ fusen::fill_description(
     Language =  "es",
   ), overwrite = TRUE
 )
+
 # Define License with use_*_license()
 usethis::use_mit_license("Santiago Sotelo")
+
 ```
 
 # Start using git
