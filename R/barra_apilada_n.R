@@ -62,7 +62,7 @@ barra_apilada_n<-function(data, ..., ordenado=TRUE){
                   nombres = as.character(nombres)) %>%
 
     full_join(labels) %>%
-    mutate(across(where(is.numeric()), ~replace_na(.,0))) %>%
+    mutate(across(where(is.numeric), ~replace_na(.,0))) %>%
 
     ungroup() %>%
     mutate(
