@@ -112,6 +112,7 @@ devtools::check()
 # set and try pkgdown documentation website
 usethis::use_pkgdown()
 pkgdown::build_site()
+pkgdown::build_site_github_pages()
 
 # build the tar.gz to share with others
 devtools::build()
