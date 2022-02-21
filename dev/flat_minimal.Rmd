@@ -292,38 +292,38 @@ barra_apilada_1<-function(data, var){
     geom_col(aes(fill=factor(color, ordered = TRUE, levels = rev(colores(num_colores)) )), position = "fill", width = 0.6) +
 
     #Etiqueta = 4
-    geom_text(aes(y=1.05, label = ifelse((numero == 4 & prop < 0.05) & !(numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
+    geom_text(aes(y=1.05, label = ifelse((numero == 4 & prop < 0.07) & !(numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
               size = 3.5,
               fontface = "bold",
               color = "#002060",
               family="sans") +
 
     #Etiqueta = 3
-    geom_text(aes(y=1.05, label = ifelse((numero == 3 & prop < 0.05) & !(numero == 3 & prop == 0) & (numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
+    geom_text(aes(y=1.05, label = ifelse((numero == 3 & prop < 0.07) & !(numero == 3 & prop == 0) & (numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
               size = 3.5,
               fontface = "bold",
               color = "#002060",
               family="sans") +
 
     #Etiqueta = 2
-    geom_text(aes(y=-0.05, label = ifelse((numero == 2 & prop < 0.05) & !(numero == 2 & prop == 0) & (numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
+    geom_text(aes(y=-0.05, label = ifelse((numero == 2 & prop < 0.07) & !(numero == 2 & prop == 0) & (numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
               size = 3.5,
               fontface = "bold",
               color = "#002060",
               family="sans") +
 
     #Etiqueta = 1
-    geom_text(aes(y=-0.05, label = ifelse((numero == 1 & prop < 0.05) & !(numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
+    geom_text(aes(y=-0.05, label = ifelse((numero == 1 & prop < 0.07) & !(numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
               size = 3.5,
               fontface = "bold",
               color = "#002060",
               family="sans") +
 
     #Etiqueta = El resto
-    geom_text(aes(label = ifelse(!((numero == 4 & prop < 0.05) |
-                                     (numero == 3 & prop < 0.05) & (numero == 4 & prop == 0) |
-                                     (numero == 2 & prop < 0.05) & (numero == 1 & prop == 0) |
-                                     (numero == 1 & prop < 0.05)) & !(prop == 0), scales::percent(prop, accuracy = 1), "") ),
+    geom_text(aes(label = ifelse(!((numero == 4 & prop < 0.07) |
+                                     (numero == 3 & prop < 0.07) & (numero == 4 & prop == 0) |
+                                     (numero == 2 & prop < 0.07) & (numero == 1 & prop == 0) |
+                                     (numero == 1 & prop < 0.07)) & !(prop == 0), scales::percent(prop, accuracy = 1), "") ),
               position = position_stack(vjust = 0.5),
               size = 3.5,
               fontface = "bold",
@@ -469,38 +469,38 @@ barra_apilada_n<-function(data, ..., ordenado=TRUE){
     geom_col(aes(fill=factor(color, ordered = TRUE, levels = c("#8FC36B","#B0D597","#FFD966","#F4B183","#D3D3D3"))), position = "fill", width = 0.6) +
 
     #Etiqueta = 4
-    geom_text(aes(y=1.05, label = ifelse((numero == 4 & prop < 0.05) & !(numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
+    geom_text(aes(y=1.05, label = ifelse((numero == 4 & prop < 0.07) & !(numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
               size = 3.5,
               fontface = "bold",
               color = "#002060",
               family="sans") +
 
     #Etiqueta = 3
-    geom_text(aes(y=1.05, label = ifelse((numero == 3 & prop < 0.05) & !(numero == 3 & prop == 0) & (numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
+    geom_text(aes(y=1.05, label = ifelse((numero == 3 & prop < 0.07) & !(numero == 3 & prop == 0) & (numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
               size = 3.5,
               fontface = "bold",
               color = "#002060",
               family="sans") +
 
     #Etiqueta = 2
-    geom_text(aes(y=-0.05, label = ifelse((numero == 2 & prop < 0.05) & !(numero == 2 & prop == 0) & (numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
+    geom_text(aes(y=-0.05, label = ifelse((numero == 2 & prop < 0.07) & !(numero == 2 & prop == 0) & (numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
               size = 3.5,
               fontface = "bold",
               color = "#002060",
               family="sans") +
 
     #Etiqueta = 1
-    geom_text(aes(y=-0.05, label = ifelse((numero == 1 & prop < 0.05) & !(numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
+    geom_text(aes(y=-0.05, label = ifelse((numero == 1 & prop < 0.07) & !(numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
               size = 3.5,
               fontface = "bold",
               color = "#002060",
               family="sans") +
 
     #Etiqueta = El resto
-    geom_text(aes(label = ifelse(!((numero == 4 & prop < 0.05) |
-                                     (numero == 3 & prop < 0.05) & (numero == 4 & prop == 0) |
-                                     (numero == 2 & prop < 0.05) & (numero == 1 & prop == 0) |
-                                     (numero == 1 & prop < 0.05)) & !(prop == 0), scales::percent(prop, accuracy = 1), "") ),
+    geom_text(aes(label = ifelse(!((numero == 4 & prop < 0.07) |
+                                     (numero == 3 & prop < 0.07) & (numero == 4 & prop == 0) |
+                                     (numero == 2 & prop < 0.07) & (numero == 1 & prop == 0) |
+                                     (numero == 1 & prop < 0.07)) & !(prop == 0), scales::percent(prop, accuracy = 1), "") ),
               position = position_stack(vjust = 0.5),
               size = 3.5,
               fontface = "bold",
