@@ -34,15 +34,20 @@ barra_apilada_n<-function(data, ..., ordenado=TRUE){
     select(...) %>%
     names()
 
-  pop<-as.character(noms)[1]
+  pop<-as.character(noms)
 
-  labels<-
-    tibble(
-      pregunta=as.character(unlist(sjlabelled::get_label(data[,pop]), use.names = FALSE)),
-      numero=as.character(unlist(sjlabelled::get_values(data[,pop]), use.names = FALSE)),
-      nombres=unlist(sjlabelled::get_labels(data[,pop]), use.names = FALSE),
-    ) %>%
-    filter(numero!=0)
+  labels <- tibble(
+    pregunta = rep(as.character(unlist(sjlabelled::get_label(data[, 
+          pop]), use.names = FALSE)), sum(nchar(unique(as.numeric(unlist(sjlabelled::get_values(data[, 
+          pop]), use.names = FALSE)))))), 
+    
+    numero = as.character(unlist(sjlabelled::get_values(data[, 
+          pop]), use.names = FALSE)), 
+    
+    nombres = unlist(sjlabelled::get_labels(data[, 
+          pop]), use.names = FALSE), ) %>% 
+    
+    filter(numero != 0)
 
   #Tabla
   tablon<-
