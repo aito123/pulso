@@ -413,15 +413,15 @@ barra_apilada_n<-function(data, ..., ordenado=TRUE){
   pop<-as.character(noms)
 
   labels <- tibble(
-    pregunta = rep(as.character(unlist(sjlabelled::get_label(data[, 
-          pop]), use.names = FALSE)), sum(nchar(unique(as.numeric(unlist(sjlabelled::get_values(data[, 
-          pop]), use.names = FALSE)))))), 
+    pregunta = sort(rep(as.character(unlist(sjlabelled::get_label(data[, 
+        pop]), use.names = FALSE)), sum(nchar(unique(as.numeric(unlist(sjlabelled::get_values(data[, 
+        pop]), use.names = FALSE))))))), 
     
     numero = as.character(unlist(sjlabelled::get_values(data[, 
-          pop]), use.names = FALSE)), 
+        pop]), use.names = FALSE)), 
     
     nombres = unlist(sjlabelled::get_labels(data[, 
-          pop]), use.names = FALSE), ) %>% 
+        pop]), use.names = FALSE), ) %>% 
     
     filter(numero != 0)
 
