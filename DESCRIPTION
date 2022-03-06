@@ -1,14 +1,47 @@
 Package: pulso
-Version: 0.0.0.9000
 Title: Funciones Para Los Informes Pulso PUCP
+Version: 0.0.0.9000
+Authors@R: 
+    person("Santiago", "Sotelo", , "santiago.sotelo@pucp.edu.pe", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9739-9964"))
 Description: Conjunto de funciones para los informes de Pulso PUCP.
-Authors@R: person(given = "Santiago",
-       family = "Sotelo",
-       role = c("aut", "cre"),
-       email = "santiago.sotelo@pucp.edu.pe",
-       comment = c(ORCID = "0000-0002-9739-9964"))
 License: MIT + file LICENSE
+Imports: 
+    cowplot,
+    DT,
+    flextable,
+    fmsb,
+    ggpubr,
+    ggrepel,
+    glue,
+    graphics,
+    grDevices,
+    grid,
+    gtsummary,
+    haven,
+    Hmisc,
+    janitor,
+    kableExtra,
+    knitr,
+    lazyeval,
+    lubridate,
+    magrittr,
+    officedown,
+    officer,
+    paletteer,
+    plotly,
+    RColorBrewer,
+    rio,
+    scales,
+    sjlabelled,
+    testthat,
+    tidyverse,
+    utils
+Suggests: 
+    rmarkdown
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
+Language: es
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-Language: es

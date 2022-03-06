@@ -5,7 +5,37 @@
 #' 
 #' @param data Base de datos para la funcion
 #' @param ... Variables para el grafico de barra apilada
-#' @importFrom sjlabelled as_label
+#' @import glue
+#' @import sjlabelled
+#' @import testthat
+#' @import tidyverse
+#' @import janitor
+#' @import glue
+#' @import lubridate
+#' @import scales
+#' @import Hmisc
+#' @import lazyeval
+#' @import plotly
+#' @import ggrepel
+#' @import cowplot
+#' @import grid
+#' @import fmsb
+#' @import haven
+#' @import rio
+#' @import officer
+#' @import officedown
+#' @import sjlabelled
+#' @import flextable
+#' @import knitr
+#' @import kableExtra
+#' @import DT
+#' @import gtsummary
+#' @import ggpubr
+#' @import paletteer
+#' @import RColorBrewer
+#' @import grDevices
+#' @import graphics
+#' @import utils
 #' @return Un grafico de barras apiladas
 #' @examples
 #' 

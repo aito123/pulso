@@ -4,8 +4,6 @@
 # pulso
 
 <!-- badges: start -->
-
-[![R-CMD-check](https://github.com/aito123/pulso/workflows/R-CMD-check/badge.svg)](https://github.com/aito123/pulso/actions)
 <!-- badges: end -->
 
 El objetivo del paquete **pulso** es estandarizar los gráficos

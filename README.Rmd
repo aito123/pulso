@@ -19,11 +19,11 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/aito123/pulso/workflows/R-CMD-check/badge.svg)](https://github.com/aito123/pulso/actions)
 <!-- badges: end -->
 
-El objetivo del paquete **pulso** es estandarizar los gr·ficos utilizados en los informes considerando un criterio estÈtico y funcional.
+El objetivo del paquete **pulso** es estandarizar los gr√°ficos utilizados en los informes considerando un criterio est√©tico y funcional.
 
-## InstalaciÛn
+## Instalaci√≥n
 
-Puede instalar la versiÛn en desarrollo del paquete **pulso** en [GitHub](https://github.com/aito123/pulso):
+Puede instalar la versi√≥n en desarrollo del paquete **pulso** en [GitHub](https://github.com/aito123/pulso):
 
 ``` r
 # install.packages("devtools")

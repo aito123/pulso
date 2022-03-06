@@ -55,6 +55,8 @@ data_prueba %>%
 
 ```{r examples-barra_apilada_1, eval = FALSE}
 
+data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+data_prueba <- haven::read_sav(data_prueba_ruta)
 
 data_prueba %>% 
   filter(q0002 %in% 1) %>% 
@@ -67,16 +69,20 @@ data_prueba %>%
 
 ```{r examples-barra_apilada_n, eval = FALSE}
 
+data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+data_prueba <- haven::read_sav(data_prueba_ruta)
 
 data_prueba %>% 
   barra_apilada_n(starts_with("q0011_"))
-
 
 ```
 
 # Grafico donut
 
 ```{r examples-grafico_donut, eval = FALSE}
+
+data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+data_prueba <- haven::read_sav(data_prueba_ruta)
 
 data_prueba %>% 
   grafico_donut(sexo)
@@ -87,6 +93,8 @@ data_prueba %>%
 
 ```{r examples-grafico_radar, eval = FALSE}
 
+data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+data_prueba <- haven::read_sav(data_prueba_ruta)
 
 radar<-
   data_prueba %>% 

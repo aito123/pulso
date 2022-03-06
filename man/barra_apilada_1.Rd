@@ -19,6 +19,8 @@ Funcion para realizar un grafico de barra apilada de 1 variable.
 }
 \examples{
 
+data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+data_prueba <- haven::read_sav(data_prueba_ruta)
 
 data_prueba \%>\% 
   filter(q0002 \%in\% 1) \%>\% 
