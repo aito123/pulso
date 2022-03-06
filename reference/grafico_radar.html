@@ -24,7 +24,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/introduccion.html">Introducción</a>
+    <a class="dropdown-item" href="../articles/introduccion.html">Introduccion</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -105,14 +105,46 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="va">radar</span><span class="op">&lt;-</span></span>
+<span class="r-in">  <span class="va">data_prueba</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu">select</span><span class="op">(</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"q0008_"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu">sjlabelled</span><span class="fu">::</span><span class="fu"><a href="https://strengejacke.github.io/sjlabelled/reference/label_to_colnames.html" class="external-link">label_to_colnames</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
+<span class="r-in">  <span class="fu">pivot_longer</span><span class="op">(</span><span class="fu">everything</span><span class="op">(</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"pregunta"</span>, values_to <span class="op">=</span> <span class="st">"numero"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
+<span class="r-in">  <span class="fu">mutate</span><span class="op">(</span>nombres<span class="op">=</span><span class="fu">sjlabelled</span><span class="fu">::</span><span class="fu"><a href="https://strengejacke.github.io/sjlabelled/reference/as_label.html" class="external-link">as_label</a></span><span class="op">(</span><span class="va">numero</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu">group_by</span><span class="op">(</span><span class="va">pregunta</span>, <span class="va">numero</span>, <span class="va">nombres</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
+<span class="r-in">  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>Freq <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu">group_by</span><span class="op">(</span><span class="va">pregunta</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>prop <span class="op">=</span> <span class="fu">round_half_up</span><span class="op">(</span><span class="va">Freq</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">Freq</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span class="r-in">                numero <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">numero</span><span class="op">)</span>,</span>
+<span class="r-in">                nombres <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">nombres</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu">separate</span><span class="op">(</span><span class="va">pregunta</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Servicio"</span>,<span class="st">"group"</span>, <span class="cn">NA</span><span class="op">)</span>,  sep<span class="op">=</span><span class="st">" - "</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">nombres</span><span class="op">!=</span><span class="st">"No"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
+<span class="r-in">  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">numero</span>, <span class="va">nombres</span>, <span class="va">Freq</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
+<span class="r-in">  <span class="fu">group_by</span><span class="op">(</span><span class="va">group</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu">pivot_wider</span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">Servicio</span>, values_from <span class="op">=</span> <span class="va">prop</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu">mutate</span><span class="op">(</span></span>
+<span class="r-in">   group<span class="op">=</span><span class="fu">case_when</span><span class="op">(</span></span>
+<span class="r-in">    <span class="va">group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="st">"Conoce este servicio de bienestar que brinda la universidad"</span> <span class="op">~</span> <span class="st">"Lo conoce"</span>,</span>
+<span class="r-in">    <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">group</span><span class="op">)</span></span>
+<span class="r-in">  <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in ungroup(.):</span> could not find function "ungroup"</span>
+<span class="r-in"></span>
+<span class="r-in"><span class="va">radar.tag</span><span class="op">&lt;-</span></span>
+<span class="r-in">  <span class="va">data_prueba</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu">select</span><span class="op">(</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"q0008_"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in select(., starts_with("q0008_")):</span> could not find function "select"</span>
+<span class="r-in"></span>
 <span class="r-in"><span class="va">radar</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">select</span><span class="op">(</span><span class="va">group</span>, <span class="va">Becas</span>, <span class="va">`Atención socio- económica`</span>, <span class="va">Empleabilidad</span>, <span class="va">`Tutorías`</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
+<span class="r-in">  <span class="fu">select</span><span class="op">(</span><span class="va">group</span>, <span class="va">`Servicio de Salud`</span>, <span class="va">`Servicio de actividad fisica y deportes`</span>, <span class="va">`Bienestar psicologico`</span>, <span class="va">`Servicios Culturales`</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
 <span class="r-in">  <span class="fu">grafico_radar</span><span class="op">(</span>polygonfill <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span class="r-in">                grid.label.size <span class="op">=</span> <span class="fl">3</span>,</span>
-<span class="r-in">                axis.label.size <span class="op">=</span> <span class="fl">3</span>,</span>
-<span class="r-in">                group.line.width <span class="op">=</span> <span class="fl">1</span>,</span>
-<span class="r-in">                fullscore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span class="r-in">         grid.label.size <span class="op">=</span> <span class="fl">3</span>,</span>
+<span class="r-in">         axis.label.size <span class="op">=</span> <span class="fl">3</span>,</span>
+<span class="r-in">         group.line.width <span class="op">=</span> <span class="fl">1</span>,</span>
+<span class="r-in">         fullscore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in">         <span class="op">)</span> <span class="op">+</span> </span>
 <span class="r-in">  </span>
 <span class="r-in">  <span class="fu">labs</span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"Elaborado por Pulso PUCP"</span>,</span>
@@ -125,7 +157,9 @@
 <span class="r-in">        <span class="op">)</span> <span class="op">+</span></span>
 <span class="r-in">  <span class="fu">guides</span><span class="op">(</span>color<span class="op">=</span><span class="fu">guide_legend</span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">2</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span class="r-in">  <span class="fu">coord_equal</span><span class="op">(</span>clip<span class="op">=</span><span class="st">"off"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in select(., group, `Servicio de Salud`, `Servicio de actividad fisica y deportes`,     `Bienestar psicologico`, `Servicios Culturales`):</span> could not find function "select"</span>
+<span class="r-in"></span>
+<span class="r-in"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
