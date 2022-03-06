@@ -9,7 +9,7 @@ grafico_donut(data, var, paleta = 1, direction = 1)
 \arguments{
 \item{data}{Base de datos para la funcion}
 
-\item{var}{Variable para grÃ¡fico donut}
+\item{var}{Variable para gráfico donut}
 }
 \value{
 Un grafico donut

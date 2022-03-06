@@ -13,6 +13,7 @@ Este paquete fue creado por Santiago Sotelo.
 
 ```{r development, include=FALSE}
 library(testthat)
+#data <- system.file("data_prueba", package = "pulso")
 
 #Paquetes necesarios
 pacman::p_load(#data tools
@@ -119,6 +120,11 @@ barra_simple(base, q0010)
 ```{r tests-barra_simple}
 # test_that("barra_simple works", {
 # 
+# })
+
+# test_that("barra_simple works", {
+#   expect_error(base %>% 
+#                  grafico_donut(q0021), regexp = NA)
 # })
 ```
 
@@ -1189,5 +1195,5 @@ radar %>%
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop
 # Execute in the console directly
-fusen::inflate(flat_file = "dev/flat_minimal.Rmd", vignette_name = "Introduccion")
+fusen::inflate(flat_file = "dev/flat_minimal.Rmd", vignette_name = "Introducción")
 ```

@@ -60,7 +60,7 @@ Funcion para realizar un grafico radar
 \examples{
 \dontrun{
 radar \%>\% 
-  select(group, Becas, `AtenciÃ³n socio- econÃ³mica`, Empleabilidad, `TutorÃ­as`) \%>\% 
+  select(group, Becas, `Atención socio- económica`, Empleabilidad, `Tutorías`) \%>\% 
   grafico_radar(polygonfill = FALSE,
                 grid.label.size = 3,
                 axis.label.size = 3,

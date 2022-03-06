@@ -21,7 +21,7 @@ barra_multiple(
 \item{...}{Variables para el grafico de barras multiple}
 }
 \value{
-Un grafico de barras mÃºltiple
+Un grafico de barras múltiple
 }
 \description{
 Funcion para realizar un grafico de barras multiple
