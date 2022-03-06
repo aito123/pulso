@@ -39,6 +39,9 @@
 #' @return Un grafico donut
 #' @examples
 #' 
+#' data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+#' data_prueba <- haven::read_sav(data_prueba_ruta)
+#' 
 #' data_prueba %>% 
 #'   grafico_donut(sexo)
 #' 

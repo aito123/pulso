@@ -38,6 +38,8 @@
 #' @return Un grafico radar
 #' @examples
 #' 
+#' data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+#' data_prueba <- haven::read_sav(data_prueba_ruta)
 #' 
 #' radar<-
 #'   data_prueba %>% 

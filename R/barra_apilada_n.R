@@ -39,10 +39,11 @@
 #' @return Un grafico de barras apiladas
 #' @examples
 #' 
+#' data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+#' data_prueba <- haven::read_sav(data_prueba_ruta)
 #' 
 #' data_prueba %>% 
 #'   barra_apilada_n(starts_with("q0011_"))
-#' 
 #' 
 #' @export
 

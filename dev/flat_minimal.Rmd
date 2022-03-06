@@ -16,7 +16,7 @@ Este paquete fue creado por Santiago Sotelo.
 #Paquetes necesarios
 pacman::p_load(
     #test
-    testthat,
+    pkgload, pkgdown, testthat,
     #data tools
     tidyverse, janitor, glue, lubridate, scales, Hmisc,lazyeval,
     #Gráficos
@@ -468,6 +468,8 @@ barra_apilada_1<-function(data, var){
 
 ```{r examples-barra_apilada_1, eval=FALSE}
 
+data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+data_prueba <- haven::read_sav(data_prueba_ruta)
 
 data_prueba %>% 
   filter(q0002 %in% 1) %>% 
@@ -686,10 +688,11 @@ barra_apilada_n<-function(data, ..., ordenado=TRUE){
 
 ```{r examples-barra_apilada_n, eval=FALSE}
 
+data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+data_prueba <- haven::read_sav(data_prueba_ruta)
 
 data_prueba %>% 
   barra_apilada_n(starts_with("q0011_"))
-
 
 ```
 
@@ -799,6 +802,9 @@ grafico_donut<- function(data, var, paleta=1, direction=1) {
 ```
 
 ```{r examples-grafico_donut, eval=FALSE}
+
+data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+data_prueba <- haven::read_sav(data_prueba_ruta)
 
 data_prueba %>% 
   grafico_donut(sexo)
@@ -1365,6 +1371,8 @@ grafico_radar<- function (plot.data, base.size = 20, webtype = "mini",
 
 ```{r examples-grafico_radar, eval=FALSE}
 
+data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+data_prueba <- haven::read_sav(data_prueba_ruta)
 
 radar<-
   data_prueba %>% 
