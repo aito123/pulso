@@ -13,7 +13,7 @@ funcional.
 ## Instalación
 
 Puede instalar la versión en desarrollo del paquete **pulso** en
-[GitHub](https://github.com/):
+[GitHub](https://github.com/aito123/pulso):
 
 ``` r
 # install.packages("devtools")

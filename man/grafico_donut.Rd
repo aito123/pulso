@@ -2,7 +2,7 @@
 % Please edit documentation in R/grafico_donut.R
 \name{grafico_donut}
 \alias{grafico_donut}
-\title{Funcion para realizar un grafico de barra apilada de n variables.}
+\title{Funcion para realizar un grafico donut.}
 \usage{
 grafico_donut(data, var, paleta = 1, direction = 1)
 }
@@ -15,11 +15,11 @@ grafico_donut(data, var, paleta = 1, direction = 1)
 Un grafico donut
 }
 \description{
-Funcion para realizar un grafico de barra apilada de n variables.
+Funcion para realizar un grafico donut.
 }
 \examples{
-\dontrun{
-base \%>\% 
-  grafico_donut(q0021)
-}
+
+data_prueba \%>\% 
+  grafico_donut(sexo)
+
 }

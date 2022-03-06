@@ -7,22 +7,27 @@ editor_options:
 ---
 
 ```{r development, include=FALSE}
-library(testthat)
+
 #Paquetes necesarios
-pacman::p_load(#data tools
-                tidyverse, janitor, glue, lubridate, scales, Hmisc,lazyeval,
-                #Gráficos
-                plotly, ggrepel, cowplot, grid, fmsb, 
-                #importar / exportar
-                haven, rio, officer, officedown,
-                #Etiquetas
-                sjlabelled,
-                #tablas
-                flextable, knitr, kableExtra, DT, gtsummary,
-                #Temas
-                ggpubr,
-                #Colores
-                paletteer, RColorBrewer)
+pacman::p_load(
+    #test
+    pkgload,testthat,
+    #data tools
+    tidyverse, janitor, glue, lubridate, scales, Hmisc,lazyeval,
+    #Gráficos
+    plotly, ggrepel, cowplot, grid, fmsb, 
+    #importar / exportar
+    haven, rio, officer, officedown,
+    #Etiquetas
+    sjlabelled,
+    #tablas
+    flextable, knitr, kableExtra, DT, gtsummary,
+    #Temas
+    ggpubr,
+    #Colores
+    paletteer, RColorBrewer
+    )
+
 ```
 
 All commands that you use to use when developing packages...
@@ -38,16 +43,23 @@ fusen::fill_description(
   fields = list(
     Package = "pulso",
     Title = "Funciones para los informes Pulso PUCP",
-    Description = "Conjunto de funciones para los informes de Pulso PUCP",
-    `Authors@R` = c(
-      person("Santiago", "Sotelo", email = "santiago.sotelo@pucp.edu.pe", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9739-9964"))
-    ),
-    Language =  "es",
+    Description = "Conjunto de funciones para los informes de Pulso PUCP.",
+    `Authors@R` = 'person("Santiago", "Sotelo", email = "santiago.sotelo@pucp.edu.pe",
+                          role = c("aut", "cre"),
+                          comment = c(ORCID = "0000-0002-9739-9964"))',
+    License = "MIT + file LICENSE",
+    Language =  "es"
   ), overwrite = TRUE
 )
 
 # Define License with use_*_license()
 usethis::use_mit_license("Santiago Sotelo")
+
+    
+    # `Authors@R` = c(
+    #   person("Santiago", "Sotelo", email = "santiago.sotelo@pucp.edu.pe", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9739-9964"))
+    # ),
+    # Language =  "es",
 
 ```
 
@@ -106,6 +118,9 @@ attachment::att_amend_desc()
 
 # Check the package
 devtools::check()
+
+# Make your dataset file available to the current Rmd
+pkgload::load_all(path = here::here(), export_all = FALSE)
 ```
 
 # Share the package
@@ -119,4 +134,3 @@ pkgdown::build_site_github_pages()
 # build the tar.gz to share with others
 devtools::build()
 ```
-

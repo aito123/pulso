@@ -12,24 +12,32 @@ vignette: >
 Este paquete fue creado por Santiago Sotelo.
 
 ```{r development, include=FALSE}
-library(testthat)
-#data <- system.file("data_prueba", package = "pulso")
 
 #Paquetes necesarios
-pacman::p_load(#data tools
-                tidyverse, janitor, glue, lubridate, scales, Hmisc,lazyeval,
-                #Gráficos
-                plotly, ggrepel, cowplot, grid, fmsb, 
-                #importar / exportar
-                haven, rio, officer, officedown,
-                #Etiquetas
-                sjlabelled,
-                #tablas
-                flextable, knitr, kableExtra, DT, gtsummary,
-                #Temas
-                ggpubr,
-                #Colores
-                paletteer, RColorBrewer)
+pacman::p_load(
+    #test
+    pkgload,testthat,
+    #data tools
+    tidyverse, janitor, glue, lubridate, scales, Hmisc,lazyeval,
+    #Gráficos
+    plotly, ggrepel, cowplot, grid, fmsb, 
+    #importar / exportar
+    haven, rio, officer, officedown,
+    #Etiquetas
+    sjlabelled,
+    #tablas
+    flextable, knitr, kableExtra, DT, gtsummary,
+    #Temas
+    ggpubr,
+    #Colores
+    paletteer, RColorBrewer
+    )
+
+data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+data_prueba <- haven::read_sav(data_prueba_ruta)
+# Make your dataset file available to the current Rmd
+load_all(path = here::here(), export_all = FALSE)
+
 ```
 
 <!--
@@ -109,22 +117,17 @@ barra_simple<- function(data, var, ordenado=TRUE, max.limit=1, color = "#B0D597"
 ```
 
 ```{r examples-barra_simple, eval=FALSE}
-#' \dontrun{
-base %>% 
-  barra_simple(q0010)
 
-barra_simple(base, q0010)
-#' }
+data_prueba %>% 
+  barra_simple(gedad, ordenado=FALSE)
+
 ```
 
 ```{r tests-barra_simple}
-# test_that("barra_simple works", {
-# 
-# })
 
 # test_that("barra_simple works", {
-#   expect_error(base %>% 
-#                  grafico_donut(q0021), regexp = NA)
+#   expect_error(data_prueba %>%
+#                  barra_simple(gedad, ordenado=FALSE), regexp = NA)
 # })
 ```
 
@@ -206,17 +209,23 @@ barra_multiple<-function(data, ..., subtitulo = "", abierta=nombres, max.limit=1
 ```
 
 ```{r examples-barra_multiple, eval=FALSE}
-#' \dontrun{
-base %>% 
+
+
+data_prueba %>% 
   filter(q0002 %in% 1) %>% 
   barra_multiple(starts_with("q0004_0"))
-#' }
+
+
 ```
 
 ```{r tests-barra_multiple}
-# test_that("barra_simple works", {
-# 
+
+# test_that("barra_multiple works", {
+#   expect_error(data_prueba %>% 
+#   filter(q0002 %in% 1) %>% 
+#   barra_multiple(starts_with("q0004_0")), regexp = NA)
 # })
+
 ```
 
 # Barra apilada 1
@@ -370,17 +379,23 @@ barra_apilada_1<-function(data, var){
 ```
 
 ```{r examples-barra_apilada_1, eval=FALSE}
-#' \dontrun{
-base %>% 
+
+
+data_prueba %>% 
   filter(q0002 %in% 1) %>% 
   barra_apilada_1(q0003_0002)
-#' }
+
+
 ```
 
 ```{r tests-barra_apilada_1}
-# test_that("barra_simple works", {
-# 
+
+# test_that("barra_apilada_1 works", {
+#   expect_error(data_prueba %>% 
+#   filter(q0002 %in% 1) %>% 
+#   barra_apilada_1(q0003_0002), regexp = NA)
 # })
+
 ```
 
 # Barra apilada n
@@ -552,23 +567,28 @@ barra_apilada_n<-function(data, ..., ordenado=TRUE){
 ```
 
 ```{r examples-barra_apilada_n, eval=FALSE}
-#' \dontrun{
-base %>% 
+
+
+data_prueba %>% 
   barra_apilada_n(starts_with("q0011_"))
-#' }
+
+
 ```
 
 ```{r tests-barra_apilada_n}
-# test_that("barra_simple works", {
-# 
+
+# test_that("barra_apilada_1 works", {
+#   expect_error(data_prueba %>% 
+#   barra_apilada_n(starts_with("q0011_")), regexp = NA)
 # })
+
 ```
 
 # Grafico donut
 
 ```{r function-grafico_donut}
 
-#' Funcion para realizar un grafico de barra apilada de n variables.
+#' Funcion para realizar un grafico donut.
 #' 
 #' @param data Base de datos para la funcion
 #' @param var Variable para gráfico donut
@@ -631,16 +651,19 @@ grafico_donut<- function(data, var, paleta=1, direction=1) {
 ```
 
 ```{r examples-grafico_donut, eval=FALSE}
-#' \dontrun{
-base %>% 
-  grafico_donut(q0021)
-#' }
+
+data_prueba %>% 
+  grafico_donut(sexo)
+
 ```
 
 ```{r tests-grafico_donut}
-# test_that("barra_simple works", {
-# 
+
+# test_that("grafico_donut works", {
+#   expect_error(data_prueba %>% 
+#   grafico_donut(sexo), regexp = NA)
 # })
+
 ```
 
 # Grafico radar
@@ -651,6 +674,10 @@ base %>%
 #' 
 #' @param data Base de datos para la funcion
 #' @importFrom sjlabelled as_label
+#' @importFrom grDevices colorRampPalette
+#' @importFrom graphics text
+#' @importFrom stats filter
+#' @importFrom utils head
 #' @return Un grafico radar
 #' @examples
 #' @export
@@ -1163,14 +1190,44 @@ grafico_radar<- function (plot.data, base.size = 20, webtype = "mini",
 ```
 
 ```{r examples-grafico_radar, eval=FALSE}
-#' \dontrun{
+
+
+radar<-
+  data_prueba %>% 
+  select(starts_with("q0008_")) %>% 
+  sjlabelled::label_to_colnames() %>%
+  pivot_longer(everything(), names_to = "pregunta", values_to = "numero") %>%
+  mutate(nombres=sjlabelled::as_label(numero)) %>% 
+  group_by(pregunta, numero, nombres) %>%
+  dplyr::summarize(Freq = n()) %>% 
+  group_by(pregunta) %>% 
+  dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),
+                numero = as.character(numero),
+                nombres = as.character(nombres)) %>% 
+  separate(pregunta, c("Servicio","group", NA),  sep=" - ") %>% 
+  filter(nombres!="No") %>%
+  select(-c(numero, nombres, Freq)) %>%
+  group_by(group) %>% 
+  pivot_wider(names_from = Servicio, values_from = prop) %>% 
+  mutate(
+   group=case_when(
+    group %in% "Conoce este servicio de bienestar que brinda la universidad" ~ "Lo conoce",
+    TRUE ~ group)
+  ) %>% 
+  ungroup()
+
+radar.tag<-
+  data_prueba %>% 
+  select(starts_with("q0008_")) %>% 
+  nrow()
+
 radar %>% 
-  select(group, Becas, `Atención socio- económica`, Empleabilidad, `Tutorías`) %>% 
+  select(group, `Servicio de Salud`, `Servicio de actividad fisica y deportes`, `Bienestar psicologico`, `Servicios Culturales`) %>% 
   grafico_radar(polygonfill = FALSE,
-                grid.label.size = 3,
-                axis.label.size = 3,
-                group.line.width = 1,
-                fullscore = as.numeric(rep(1,ncol(.)-1)),
+         grid.label.size = 3,
+         axis.label.size = 3,
+         group.line.width = 1,
+         fullscore = as.numeric(rep(1,ncol(.)-1))
          ) + 
   
   labs(caption = "Elaborado por Pulso PUCP",
@@ -1183,17 +1240,38 @@ radar %>%
         ) +
   guides(color=guide_legend(nrow = 2, byrow = TRUE)) +
   coord_equal(clip="off")
-#' }
+
+
 ```
 
 ```{r tests-grafico_radar}
-# test_that("barra_simple works", {
-# 
+
+# test_that("grafico_donut works", {
+#   expect_error(radar %>% 
+#   select(group, `Servicio de Salud`, `Servicio de actividad fisica y deportes`, `Bienestar psicologico`, `Servicios Culturales`) %>% 
+#   grafico_radar(polygonfill = FALSE,
+#          grid.label.size = 3,
+#          axis.label.size = 3,
+#          group.line.width = 1,
+#          fullscore = as.numeric(rep(1,ncol(.)-1))
+#          ) + 
+#   
+#   labs(caption = "Elaborado por Pulso PUCP",
+#        tag = glue("N=",radar.tag)) +
+#   
+#   theme(legend.title = element_blank(),legend.position = "bottom",legend.text = element_text(size=10, face = "bold",family="sans"),legend.key.height = unit(.2, "cm"),
+#         plot.caption = element_text(face = "italic",family="sans"),plot.margin = unit(c(0,0,1,0),"cm"),plot.tag = element_text(size = 8, color="grey40"),plot.tag.position = "topright",
+#         
+#         text = element_text(size = 9, color="#002060",family="sans"),
+#         ) +
+#   guides(color=guide_legend(nrow = 2, byrow = TRUE)) +
+#   coord_equal(clip="off"), regexp = NA)
 # })
+
 ```
 
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop
 # Execute in the console directly
-fusen::inflate(flat_file = "dev/flat_minimal.Rmd", vignette_name = "Introducción")
+fusen::inflate(flat_file = "dev/flat_minimal.Rmd", vignette_name = "Introduccion")
 ```

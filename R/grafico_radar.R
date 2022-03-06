@@ -5,16 +5,50 @@
 #' 
 #' @param data Base de datos para la funcion
 #' @importFrom sjlabelled as_label
+#' @importFrom grDevices colorRampPalette
+#' @importFrom graphics text
+#' @importFrom stats filter
+#' @importFrom utils head
 #' @return Un grafico radar
 #' @examples
-#' \dontrun{
+#' 
+#' 
+#' radar<-
+#'   data_prueba %>% 
+#'   select(starts_with("q0008_")) %>% 
+#'   sjlabelled::label_to_colnames() %>%
+#'   pivot_longer(everything(), names_to = "pregunta", values_to = "numero") %>%
+#'   mutate(nombres=sjlabelled::as_label(numero)) %>% 
+#'   group_by(pregunta, numero, nombres) %>%
+#'   dplyr::summarize(Freq = n()) %>% 
+#'   group_by(pregunta) %>% 
+#'   dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),
+#'                 numero = as.character(numero),
+#'                 nombres = as.character(nombres)) %>% 
+#'   separate(pregunta, c("Servicio","group", NA),  sep=" - ") %>% 
+#'   filter(nombres!="No") %>%
+#'   select(-c(numero, nombres, Freq)) %>%
+#'   group_by(group) %>% 
+#'   pivot_wider(names_from = Servicio, values_from = prop) %>% 
+#'   mutate(
+#'    group=case_when(
+#'     group %in% "Conoce este servicio de bienestar que brinda la universidad" ~ "Lo conoce",
+#'     TRUE ~ group)
+#'   ) %>% 
+#'   ungroup()
+#' 
+#' radar.tag<-
+#'   data_prueba %>% 
+#'   select(starts_with("q0008_")) %>% 
+#'   nrow()
+#' 
 #' radar %>% 
-#'   select(group, Becas, `AtenciÃ³n socio- econÃ³mica`, Empleabilidad, `TutorÃ­as`) %>% 
+#'   select(group, `Servicio de Salud`, `Servicio de actividad fisica y deportes`, `Bienestar psicologico`, `Servicios Culturales`) %>% 
 #'   grafico_radar(polygonfill = FALSE,
-#'                 grid.label.size = 3,
-#'                 axis.label.size = 3,
-#'                 group.line.width = 1,
-#'                 fullscore = as.numeric(rep(1,ncol(.)-1)),
+#'          grid.label.size = 3,
+#'          axis.label.size = 3,
+#'          group.line.width = 1,
+#'          fullscore = as.numeric(rep(1,ncol(.)-1))
 #'          ) + 
 #'   
 #'   labs(caption = "Elaborado por Pulso PUCP",
@@ -27,7 +61,8 @@
 #'         ) +
 #'   guides(color=guide_legend(nrow = 2, byrow = TRUE)) +
 #'   coord_equal(clip="off")
-#' }
+#' 
+#' 
 #' @export
 
 grafico_radar<- function (plot.data, base.size = 20, webtype = "mini",

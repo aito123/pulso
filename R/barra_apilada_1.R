@@ -8,11 +8,13 @@
 #' @importFrom sjlabelled as_label
 #' @return Un grafico de barra apilado
 #' @examples
-#' \dontrun{
-#' base %>% 
+#' 
+#' 
+#' data_prueba %>% 
 #'   filter(q0002 %in% 1) %>% 
 #'   barra_apilada_1(q0003_0002)
-#' }
+#' 
+#' 
 #' @export
 
 barra_apilada_1<-function(data, var){

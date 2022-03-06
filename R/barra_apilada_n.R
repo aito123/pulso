@@ -8,10 +8,12 @@
 #' @importFrom sjlabelled as_label
 #' @return Un grafico de barras apiladas
 #' @examples
-#' \dontrun{
-#' base %>% 
+#' 
+#' 
+#' data_prueba %>% 
 #'   barra_apilada_n(starts_with("q0011_"))
-#' }
+#' 
+#' 
 #' @export
 
 barra_apilada_n<-function(data, ..., ordenado=TRUE){

@@ -7,22 +7,19 @@ Authors@R:
 Description: Conjunto de funciones para los informes de Pulso PUCP.
 License: MIT + file LICENSE
 Imports: 
-    dplyr,
-    ggplot2,
     glue,
-    lazyeval,
+    graphics,
+    grDevices,
     magrittr,
-    scales,
-    sjlabelled
+    sjlabelled,
+    stats,
+    utils
 Suggests: 
     knitr,
-    rmarkdown,
-    testthat
+    rmarkdown
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
+Language: es
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-Depends: 
-    R (>= 2.10)
-LazyData: true

@@ -18,8 +18,10 @@ Un grafico de barras apiladas
 Funcion para realizar un grafico de barra apilada de n variables.
 }
 \examples{
-\dontrun{
-base \%>\% 
+
+
+data_prueba \%>\% 
   barra_apilada_n(starts_with("q0011_"))
-}
+
+
 }

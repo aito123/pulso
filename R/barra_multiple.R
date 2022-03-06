@@ -9,11 +9,13 @@
 #' @importFrom sjlabelled as_label
 #' @return Un grafico de barras mÃºltiple
 #' @examples
-#' \dontrun{
-#' base %>% 
+#' 
+#' 
+#' data_prueba %>% 
 #'   filter(q0002 %in% 1) %>% 
 #'   barra_multiple(starts_with("q0004_0"))
-#' }
+#' 
+#' 
 #' @export
 
 barra_multiple<-function(data, ..., subtitulo = "", abierta=nombres, max.limit=1, ultimo=NULL, color = "#B0D597", ext.label=30){
