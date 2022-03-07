@@ -71,6 +71,8 @@ usethis::git_vaccinate()
 ```{r, eval=FALSE}
 # README
 usethis::use_readme_rmd()
+#file.remove(".git/hooks/pre-commit")
+
 # Code of Conduct
 usethis::use_code_of_conduct("contact@fake.com")
 # NEWS

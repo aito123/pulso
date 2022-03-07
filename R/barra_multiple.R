@@ -5,10 +5,18 @@
 #' 
 #' @param data Base de datos para la funcion
 #' @param ... Variables para el grafico de barras multiple
+#' @param filtrar Por default TRUE que significa ningÃºn filtro, si se quiere filtrar por una variable especificar la variable y el valor a filtrar (ej: filtrar = q0002 == 1 que significa filtrar la base para que aparezcan solo los casos que tienen en la pregunta q0002 el valor de 1).
+#' @param abierta Por default abierta es FALSE, es necesario cambiarla a TRUE cuando se trabaja con una pregunta abierta lo cual tendra un impacto en las etiquetas.
+#' @param frecuencia Por default es FALSE, cambiar a TRUE para visualizar los resultados en frecuencias y no en porcentajes.
+#' @param porcentaje Por default es TRUE, cambiar a FALSE para visualizar los resultados de porcentajes sin el simbolo %.
+#' @param ultimo Por default es NULL, escribir entre comillas la palabra que quieres que vaya al final de las barras (ej: ultimo="Otros")
+#' @param max.limit Por default es 1, es el limite mÃ¡ximo del eje x. 1=100 cuando son resultados en porcentajes (ej: max.limit=0.75 significa maximo 75%). Aunque el porcentaje estÃ© en FALSE, el max.limit debe ser tratado como si 1.00 fuera el maximo y no como si 100 fuera el maximo.
+#' @param color Por default es color azul que es "#B0D597" en notacion hexagesimal. Buscar colores hex para mÃ¡s informaciÃ³n. TambiÃ©n permite colores grabados en R como "red".
+#' @param ext.label Por default es 30, a menor el nÃºmero menor espacio para el texto de las etiquetas.
+#' @import tidyverse
 #' @import glue
 #' @import sjlabelled
 #' @import testthat
-#' @import tidyverse
 #' @import janitor
 #' @import glue
 #' @import lubridate
@@ -40,71 +48,134 @@
 #' @examples
 #' 
 #' 
-#' data_prueba %>% 
-#'   filter(q0002 %in% 1) %>% 
-#'   barra_multiple(starts_with("q0004_0"))
+#' # data_prueba %>% 
+#' #   filter(q0002 %in% 1) %>% 
+#' #   barra_multiple(starts_with("q0004_0"))
 #' 
 #' 
 #' @export
 
-barra_multiple<-function(data, ..., subtitulo = "", abierta=nombres, max.limit=1, ultimo=NULL, color = "#B0D597", ext.label=30){
-
+barra_multiple<-function(data, ..., filtrar=TRUE, abierta=FALSE, frecuencia=FALSE, porcentaje=TRUE, ultimo=NULL, max.limit=1, color = "#B0D597", ext.label=30){
+  
+  total<-nrow(data)
+  
   tag<-
     data %>%
+    filter({{filtrar}}) %>% 
     sjlabelled::as_label() %>%
     select(...) %>% nrow()
+  
+  tablon<-
+    data %>%
+      filter({{filtrar}}) %>% 
+      #tabla
+      sjlabelled::as_label() %>%
+      select(...) %>%
+      pivot_longer(everything(), names_to = "pregunta", values_to = "nombres") %>%
+      group_by(pregunta, nombres) %>%
+      dplyr::summarize(Freq = n()) %>%
+      group_by(pregunta) %>%
+      dplyr::mutate(pct = round_half_up(Freq/sum(Freq), digits = 2),
+                    nombres = as.character(nombres)) %>%
+      drop_na(nombres) %>%
+      filter(!(nombres %in% "")) %>%
+      ungroup()
+  
+  if(isTRUE(frecuencia)) {
+    
+     tablon %>%  
+      #grafico
+      ggplot(aes(x =fct_relevel( fct_reorder(if(isTRUE(abierta)){ pregunta }else{ nombres }, pct, min), ultimo), y = Freq) ) +
+      geom_bar(stat='identity', fill = color, width = 0.6) +
+      
+      #Etiqueta = -7%
+      geom_text(aes(label = ifelse(pct < 0.07, Freq, "") ),
+                position = position_dodge(width = .9),
+                vjust = 0.2,
+                hjust = -0.2,
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
+      
+      #Etiqueta = El resto
+      geom_text(aes(label = ifelse(pct >= 0.07, Freq, "") ),
+                position = position_stack(vjust = 0.5),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
+      
+      scale_x_discrete(labels = wrap_format(ext.label)) +
+      scale_y_continuous(limits = c(0, if(max.limit==1){max(tablon$Freq) + round_half_up(max(tablon$Freq)/3)} else {max.limit} )) +
+      coord_flip() +
+      theme_pubr() +
+      labs(subtitle = "Resultados en frecuencias",
+           caption = "Elaborado por Pulso PUCP",
+           tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} ) +
+      theme(text = element_text(size = 9, color="#002060"),
+            
+            plot.subtitle = element_text(size = 10, color="#002060"),
+            plot.title.position = "plot",
+            
+            plot.caption = element_text(face = "italic"),
+            
+            plot.tag = element_text(size = 8, color="grey40"),
+            plot.tag.position = "bottomleft",
+            
+            axis.title = element_blank(),
+            axis.text = element_text(color="#002060"),
+            axis.ticks = element_line(color="#002060"),
+            axis.line = element_line(color="#002060", size = 0.5)
+            )
+   
+  }
+  else
+  {
+    
+    tablon %>%  
+      #grafico
+      ggplot(aes(x =fct_relevel( fct_reorder(if(isTRUE(abierta)){ pregunta }else{ nombres }, pct, min), ultimo), y = pct) ) +
+      geom_bar(stat='identity', fill = color, width = 0.6) +
+      
+      #Etiqueta = -7%
+      geom_text(aes(label = ifelse(pct < 0.07, if(isTRUE(porcentaje)){scales::percent(pct, accuracy = 1)} else {scales::number(pct, scale = 100)} , "") ),
+                position = position_dodge(width = .9),
+                vjust = 0.2,
+                hjust = -0.2,
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
+      
+      #Etiqueta = El resto
+      geom_text(aes(label = ifelse(pct >= 0.07, if(isTRUE(porcentaje)){scales::percent(pct, accuracy = 1)} else {scales::number(pct, scale = 100)}, "") ),
+                position = position_stack(vjust = 0.5),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
 
-  data %>%
-    #tabla
-    sjlabelled::as_label() %>%
-    select(...) %>%
-    pivot_longer(everything(), names_to = "pregunta", values_to = "nombres") %>%
-    group_by(pregunta, nombres) %>%
-    dplyr::summarize(Freq = n()) %>%
-    group_by(pregunta) %>%
-    dplyr::mutate(pct = round_half_up(Freq/sum(Freq), digits = 2),
-                  nombres = as.character(nombres)) %>%
-    drop_na(nombres) %>%
-    filter(!(nombres %in% "")) %>%
-    ungroup() %>%
-
-    #grafico
-    ggplot(aes(x =fct_relevel( fct_reorder({{abierta}}, pct, min), ultimo), y = pct) ) +
-    geom_bar(stat='identity', fill = color, width = 0.6) +
-
-    #Etiqueta = -10%
-    geom_text(aes(label = ifelse(pct < 0.1, scales::percent(pct, accuracy = 1), "") ),
-              position = position_dodge(width = .9),
-              vjust = 0.2,
-              hjust = -0.2,
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060") +
-
-    #Etiqueta = El resto
-    geom_text(aes(label = ifelse(pct >= 0.1, scales::percent(pct, accuracy = 1), "") ),
-              position = position_stack(vjust = 0.5),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060") +
-
-    scale_x_discrete(labels = wrap_format(ext.label)) +
-    scale_y_continuous(labels=~scales::percent(.x, accuracy = 1), limits = c(0, max.limit)) +
-    coord_flip() +
-    theme_pubr() +
-    labs(subtitle = subtitulo,
-         caption = "Elaborado por Pulso PUCP",
-         tag = glue("N=",tag) ) +
-    theme(plot.caption = element_text(face = "italic"),
-          plot.tag = element_text(size = 8, color="grey40"),
-          plot.tag.position = "topright",
-          plot.subtitle = element_text(face="italic", size = 10),
-          plot.title.position = "plot",
-          text = element_text(size = 9, color="#002060"),
-          axis.title = element_blank(),
-          axis.text = element_text(color="#002060"),
-          axis.ticks = element_line(color="#002060"),
-          axis.line = element_line(color="#002060", size = 0.5) )
+      scale_x_discrete(labels = wrap_format(ext.label)) +
+      scale_y_continuous(labels = if(isTRUE(porcentaje)) {~scales::percent(.x, accuracy = 1)} else {~scales::number(.x, scale = 100)}, limits = if(isTRUE(porcentaje)) {c(0, max.limit)} else { c(0, max.limit )} ) +
+      coord_flip() +
+      theme_pubr() +
+      labs(subtitle = if(isTRUE(porcentaje)){waiver()} else {"Resultados en porcentajes"},
+           caption = "Elaborado por Pulso PUCP",
+           tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} ) +
+      theme(text = element_text(size = 9, color="#002060"),
+            
+            plot.subtitle = element_text(size = 10, color="#002060"),
+            plot.title.position = "plot",
+            
+            plot.caption = element_text(face = "italic"),
+            
+            plot.tag = element_text(size = 8, color="grey40"),
+            plot.tag.position = "bottomleft",
+            
+            axis.title = element_blank(),
+            axis.text = element_text(color="#002060"),
+            axis.ticks = element_line(color="#002060"),
+            axis.line = element_line(color="#002060", size = 0.5)
+      )
+    
+  }
 }
 
 

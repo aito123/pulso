@@ -52,10 +52,18 @@ load_all(path = here::here(), export_all = FALSE)
 #' 
 #' @param data Base de datos para la funcion
 #' @param var Variable para el grafico de barras simple
+#' @param filtrar Por default TRUE que significa ningún filtro, si se quiere filtrar por una variable especificar la variable y el valor a filtrar (ej: filtrar = q0002 == 1 que significa filtrar la base para que aparezcan solo los casos que tienen en la pregunta q0002 el valor de 1).
+#' @param ordenado Por default es TRUE, significa que ordena las barras de menor a mayor, cambiar a FALSE para dejarlas en el orden original.
+#' @param frecuencia Por default es FALSE, cambiar a TRUE para visualizar los resultados en frecuencias y no en porcentajes.
+#' @param porcentaje Por default es TRUE, cambiar a FALSE para visualizar los resultados de porcentajes sin el simbolo %.
+#' @param ultimo Por default es NULL, escribir entre comillas la palabra que quieres que vaya al final de las barras (ej: ultimo="Otros")
+#' @param max.limit Por default es 1, es el limite máximo del eje x. 1=100 cuando son resultados en porcentajes (ej: max.limit=0.75 significa maximo 75%). Aunque el porcentaje esté en FALSE, el max.limit debe ser tratado como si 1.00 fuera el maximo y no como si 100 fuera el maximo.
+#' @param color Por default es color azul que es "#B0D597" en notacion hexagesimal. Buscar colores hex para más información. También permite colores grabados en R como "red".
+#' @param ext.label Por default es 30, a menor el número menor espacio para el texto de las etiquetas.
+#' @import tidyverse
 #' @import glue
 #' @import sjlabelled
 #' @import testthat
-#' @import tidyverse
 #' @import janitor
 #' @import glue
 #' @import lubridate
@@ -87,68 +95,128 @@ load_all(path = here::here(), export_all = FALSE)
 #' @examples
 #' @export
 
-barra_simple<- function(data, var, ordenado=TRUE, max.limit=1, color = "#B0D597", ultimo=NULL){
-
+barra_simple<- function(data, var, filtrar=TRUE, ordenado=TRUE, frecuencia=FALSE,  porcentaje=TRUE, ultimo=NULL, max.limit=1, color = "#B0D597", ext.label=30){
+  
+  total<-nrow(data)
+  
   if(isTRUE(ordenado)) {
-
+    
     tablon<-data %>%
+      filter({{filtrar}}) %>% 
       sjlabelled::as_label() %>%
       count(var = fct_rev(fct_infreq(factor({{var}}))) ) %>%
       mutate(pct = prop.table(n))
-
+    
   } else {
-
+    
     tablon<-data %>%
+      filter({{filtrar}}) %>% 
       sjlabelled::as_label() %>%
       count(var = fct_rev(factor({{var}}))) %>%
       mutate(pct = prop.table(n))
-
+    
   }
-
-  tablon %>%
-    #grafico
-    ggplot(aes(x = fct_relevel(var, ultimo), y = pct) ) +
-    geom_bar(stat='identity', fill = color, width = 0.6) +
-
-    #Etiqueta = -10%
-    geom_text(aes(label = ifelse(pct < 0.07, scales::percent(pct, accuracy = 1), "") ),
-              position = position_dodge(width = .9),
-              vjust = 0.2,
-              hjust = -0.2,
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060") +
-
-    #Etiqueta = El resto
-    geom_text(aes(label = ifelse(pct >= 0.07, scales::percent(pct, accuracy = 1), "") ),
-              position = position_stack(vjust = 0.5),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060") +
-
-    scale_x_discrete(labels = wrap_format(25)) +
-    scale_y_continuous(labels=~scales::percent(.x, accuracy = 1), limits = c(0, max.limit)) +
-    coord_flip() +
-    theme_pubr() +
-    labs(caption = "Elaborado por Pulso PUCP",
-         tag = glue("N=",sum(tablon$n))) +
-    theme(plot.caption = element_text(face = "italic"),
-          plot.tag = element_text(size = 8, color="grey40"),
-          plot.tag.position = "topright",
-          text = element_text(size = 9, color="#002060"),
-          axis.title = element_blank(),
-          axis.text = element_text(color="#002060"),
-          axis.ticks = element_line(color="#002060"),
-          axis.line = element_line(color="#002060", size = 0.5) )
-
+  
+  if(isTRUE(frecuencia)) {
+    
+    tablon %>%
+      #grafico
+      ggplot(aes(x = fct_relevel(var, ultimo), y = n ) ) +
+      geom_bar(stat='identity', fill = color, width = 0.6) +
+      
+      #Etiqueta = -7%
+      geom_text(aes(label = ifelse(pct < 0.07, n, "") ),
+                position = position_dodge(width = .9),
+                vjust = 0.2,
+                hjust = -0.2,
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
+      
+      #Etiqueta = El resto
+      geom_text(aes(label = ifelse(pct >= 0.07, n, "") ),
+                position = position_stack(vjust = 0.5),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
+      
+      scale_x_discrete(labels = wrap_format(ext.label)) +
+      scale_y_continuous(limits = c(0, if(max.limit==1){max(tablon$n) + round_half_up(max(tablon$n)/3)} else {max.limit} )) +
+      coord_flip() +
+      theme_pubr() +
+      labs(subtitle = "Resultados en frecuencias",
+           caption = "Elaborado por Pulso PUCP",
+           tag = if(sum(tablon$n) == total){glue("N=",sum(tablon$n))}else{glue("N=",sum(tablon$n),"/",total)}) +
+      theme(text = element_text(size = 9, color="#002060"),
+            
+            plot.subtitle = element_text(size = 10, color="#002060"),
+            plot.title.position = "plot",
+            
+            plot.caption = element_text(face = "italic"),
+            
+            plot.tag = element_text(size = 8, color="grey40"),
+            plot.tag.position = "bottomleft",
+            
+            axis.title = element_blank(),
+            axis.text = element_text(color="#002060"),
+            axis.ticks = element_line(color="#002060"),
+            axis.line = element_line(color="#002060", size = 0.5) )
+    
+  } else {
+    
+    tablon %>%
+      #grafico
+      ggplot(aes(x = fct_relevel(var, ultimo), y = pct ) ) +
+      geom_bar(stat='identity', fill = color, width = 0.6) +
+      
+      #Etiqueta = -7%
+      geom_text(aes(label = ifelse(pct < 0.07, if(isTRUE(porcentaje)){scales::percent(pct, accuracy = 1)} else {scales::number(pct, scale = 100)} , "") ),
+                position = position_dodge(width = .9),
+                vjust = 0.2,
+                hjust = -0.2,
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
+      
+      #Etiqueta = El resto
+      geom_text(aes(label = ifelse(pct >= 0.07, if(isTRUE(porcentaje)){scales::percent(pct, accuracy = 1)} else {scales::number(pct, scale = 100)}, "") ),
+                position = position_stack(vjust = 0.5),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
+      
+      scale_x_discrete(labels = wrap_format(ext.label)) +
+      scale_y_continuous(labels = if(isTRUE(porcentaje)) {~scales::percent(.x, accuracy = 1)} else {~scales::number(.x, scale = 100)}, limits = if(isTRUE(porcentaje)) {c(0, max.limit)} else { c(0, max.limit )} ) +
+      coord_flip() +
+      theme_pubr() +
+      labs(subtitle = if(isTRUE(porcentaje)){waiver()} else {"Resultados en porcentajes"},
+           caption = "Elaborado por Pulso PUCP",
+           tag = if(sum(tablon$n) == total){glue("N=",sum(tablon$n))}else{glue("N=",sum(tablon$n),"/",total)}) +
+      theme(text = element_text(size = 9, color="#002060"),
+            
+            plot.subtitle = element_text(size = 10, color="#002060"),
+            plot.title.position = "plot",
+            
+            plot.caption = element_text(face = "italic"),
+            
+            plot.tag = element_text(size = 8, color="grey40"),
+            plot.tag.position = "bottomleft",
+            
+            axis.title = element_blank(),
+            axis.text = element_text(color="#002060"),
+            axis.ticks = element_line(color="#002060"),
+            axis.line = element_line(color="#002060", size = 0.5) )
+      
+  }
+  
 }
 
 ```
 
 ```{r examples-barra_simple, eval=FALSE}
 
-data_prueba %>% 
-  barra_simple(gedad, ordenado=FALSE)
+# data_prueba %>% 
+#   barra_simple(gedad, ordenado=FALSE)
 
 ```
 
@@ -168,10 +236,18 @@ data_prueba %>%
 #' 
 #' @param data Base de datos para la funcion
 #' @param ... Variables para el grafico de barras multiple
+#' @param filtrar Por default TRUE que significa ningún filtro, si se quiere filtrar por una variable especificar la variable y el valor a filtrar (ej: filtrar = q0002 == 1 que significa filtrar la base para que aparezcan solo los casos que tienen en la pregunta q0002 el valor de 1).
+#' @param abierta Por default abierta es FALSE, es necesario cambiarla a TRUE cuando se trabaja con una pregunta abierta lo cual tendra un impacto en las etiquetas.
+#' @param frecuencia Por default es FALSE, cambiar a TRUE para visualizar los resultados en frecuencias y no en porcentajes.
+#' @param porcentaje Por default es TRUE, cambiar a FALSE para visualizar los resultados de porcentajes sin el simbolo %.
+#' @param ultimo Por default es NULL, escribir entre comillas la palabra que quieres que vaya al final de las barras (ej: ultimo="Otros")
+#' @param max.limit Por default es 1, es el limite máximo del eje x. 1=100 cuando son resultados en porcentajes (ej: max.limit=0.75 significa maximo 75%). Aunque el porcentaje esté en FALSE, el max.limit debe ser tratado como si 1.00 fuera el maximo y no como si 100 fuera el maximo.
+#' @param color Por default es color azul que es "#B0D597" en notacion hexagesimal. Buscar colores hex para más información. También permite colores grabados en R como "red".
+#' @param ext.label Por default es 30, a menor el número menor espacio para el texto de las etiquetas.
+#' @import tidyverse
 #' @import glue
 #' @import sjlabelled
 #' @import testthat
-#' @import tidyverse
 #' @import janitor
 #' @import glue
 #' @import lubridate
@@ -203,64 +279,127 @@ data_prueba %>%
 #' @examples
 #' @export
 
-barra_multiple<-function(data, ..., subtitulo = "", abierta=nombres, max.limit=1, ultimo=NULL, color = "#B0D597", ext.label=30){
-
+barra_multiple<-function(data, ..., filtrar=TRUE, abierta=FALSE, frecuencia=FALSE, porcentaje=TRUE, ultimo=NULL, max.limit=1, color = "#B0D597", ext.label=30){
+  
+  total<-nrow(data)
+  
   tag<-
     data %>%
+    filter({{filtrar}}) %>% 
     sjlabelled::as_label() %>%
     select(...) %>% nrow()
+  
+  tablon<-
+    data %>%
+      filter({{filtrar}}) %>% 
+      #tabla
+      sjlabelled::as_label() %>%
+      select(...) %>%
+      pivot_longer(everything(), names_to = "pregunta", values_to = "nombres") %>%
+      group_by(pregunta, nombres) %>%
+      dplyr::summarize(Freq = n()) %>%
+      group_by(pregunta) %>%
+      dplyr::mutate(pct = round_half_up(Freq/sum(Freq), digits = 2),
+                    nombres = as.character(nombres)) %>%
+      drop_na(nombres) %>%
+      filter(!(nombres %in% "")) %>%
+      ungroup()
+  
+  if(isTRUE(frecuencia)) {
+    
+     tablon %>%  
+      #grafico
+      ggplot(aes(x =fct_relevel( fct_reorder(if(isTRUE(abierta)){ pregunta }else{ nombres }, pct, min), ultimo), y = Freq) ) +
+      geom_bar(stat='identity', fill = color, width = 0.6) +
+      
+      #Etiqueta = -7%
+      geom_text(aes(label = ifelse(pct < 0.07, Freq, "") ),
+                position = position_dodge(width = .9),
+                vjust = 0.2,
+                hjust = -0.2,
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
+      
+      #Etiqueta = El resto
+      geom_text(aes(label = ifelse(pct >= 0.07, Freq, "") ),
+                position = position_stack(vjust = 0.5),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
+      
+      scale_x_discrete(labels = wrap_format(ext.label)) +
+      scale_y_continuous(limits = c(0, if(max.limit==1){max(tablon$Freq) + round_half_up(max(tablon$Freq)/3)} else {max.limit} )) +
+      coord_flip() +
+      theme_pubr() +
+      labs(subtitle = "Resultados en frecuencias",
+           caption = "Elaborado por Pulso PUCP",
+           tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} ) +
+      theme(text = element_text(size = 9, color="#002060"),
+            
+            plot.subtitle = element_text(size = 10, color="#002060"),
+            plot.title.position = "plot",
+            
+            plot.caption = element_text(face = "italic"),
+            
+            plot.tag = element_text(size = 8, color="grey40"),
+            plot.tag.position = "bottomleft",
+            
+            axis.title = element_blank(),
+            axis.text = element_text(color="#002060"),
+            axis.ticks = element_line(color="#002060"),
+            axis.line = element_line(color="#002060", size = 0.5)
+            )
+   
+  }
+  else
+  {
+    
+    tablon %>%  
+      #grafico
+      ggplot(aes(x =fct_relevel( fct_reorder(if(isTRUE(abierta)){ pregunta }else{ nombres }, pct, min), ultimo), y = pct) ) +
+      geom_bar(stat='identity', fill = color, width = 0.6) +
+      
+      #Etiqueta = -7%
+      geom_text(aes(label = ifelse(pct < 0.07, if(isTRUE(porcentaje)){scales::percent(pct, accuracy = 1)} else {scales::number(pct, scale = 100)} , "") ),
+                position = position_dodge(width = .9),
+                vjust = 0.2,
+                hjust = -0.2,
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
+      
+      #Etiqueta = El resto
+      geom_text(aes(label = ifelse(pct >= 0.07, if(isTRUE(porcentaje)){scales::percent(pct, accuracy = 1)} else {scales::number(pct, scale = 100)}, "") ),
+                position = position_stack(vjust = 0.5),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060") +
 
-  data %>%
-    #tabla
-    sjlabelled::as_label() %>%
-    select(...) %>%
-    pivot_longer(everything(), names_to = "pregunta", values_to = "nombres") %>%
-    group_by(pregunta, nombres) %>%
-    dplyr::summarize(Freq = n()) %>%
-    group_by(pregunta) %>%
-    dplyr::mutate(pct = round_half_up(Freq/sum(Freq), digits = 2),
-                  nombres = as.character(nombres)) %>%
-    drop_na(nombres) %>%
-    filter(!(nombres %in% "")) %>%
-    ungroup() %>%
-
-    #grafico
-    ggplot(aes(x =fct_relevel( fct_reorder({{abierta}}, pct, min), ultimo), y = pct) ) +
-    geom_bar(stat='identity', fill = color, width = 0.6) +
-
-    #Etiqueta = -10%
-    geom_text(aes(label = ifelse(pct < 0.1, scales::percent(pct, accuracy = 1), "") ),
-              position = position_dodge(width = .9),
-              vjust = 0.2,
-              hjust = -0.2,
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060") +
-
-    #Etiqueta = El resto
-    geom_text(aes(label = ifelse(pct >= 0.1, scales::percent(pct, accuracy = 1), "") ),
-              position = position_stack(vjust = 0.5),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060") +
-
-    scale_x_discrete(labels = wrap_format(ext.label)) +
-    scale_y_continuous(labels=~scales::percent(.x, accuracy = 1), limits = c(0, max.limit)) +
-    coord_flip() +
-    theme_pubr() +
-    labs(subtitle = subtitulo,
-         caption = "Elaborado por Pulso PUCP",
-         tag = glue("N=",tag) ) +
-    theme(plot.caption = element_text(face = "italic"),
-          plot.tag = element_text(size = 8, color="grey40"),
-          plot.tag.position = "topright",
-          plot.subtitle = element_text(face="italic", size = 10),
-          plot.title.position = "plot",
-          text = element_text(size = 9, color="#002060"),
-          axis.title = element_blank(),
-          axis.text = element_text(color="#002060"),
-          axis.ticks = element_line(color="#002060"),
-          axis.line = element_line(color="#002060", size = 0.5) )
+      scale_x_discrete(labels = wrap_format(ext.label)) +
+      scale_y_continuous(labels = if(isTRUE(porcentaje)) {~scales::percent(.x, accuracy = 1)} else {~scales::number(.x, scale = 100)}, limits = if(isTRUE(porcentaje)) {c(0, max.limit)} else { c(0, max.limit )} ) +
+      coord_flip() +
+      theme_pubr() +
+      labs(subtitle = if(isTRUE(porcentaje)){waiver()} else {"Resultados en porcentajes"},
+           caption = "Elaborado por Pulso PUCP",
+           tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} ) +
+      theme(text = element_text(size = 9, color="#002060"),
+            
+            plot.subtitle = element_text(size = 10, color="#002060"),
+            plot.title.position = "plot",
+            
+            plot.caption = element_text(face = "italic"),
+            
+            plot.tag = element_text(size = 8, color="grey40"),
+            plot.tag.position = "bottomleft",
+            
+            axis.title = element_blank(),
+            axis.text = element_text(color="#002060"),
+            axis.ticks = element_line(color="#002060"),
+            axis.line = element_line(color="#002060", size = 0.5)
+      )
+    
+  }
 }
 
 
@@ -269,9 +408,9 @@ barra_multiple<-function(data, ..., subtitulo = "", abierta=nombres, max.limit=1
 ```{r examples-barra_multiple, eval=FALSE}
 
 
-data_prueba %>% 
-  filter(q0002 %in% 1) %>% 
-  barra_multiple(starts_with("q0004_0"))
+# data_prueba %>% 
+#   filter(q0002 %in% 1) %>% 
+#   barra_multiple(starts_with("q0004_0"))
 
 
 ```
@@ -286,9 +425,9 @@ data_prueba %>%
 
 ```
 
-# Barra apilada 1
+# Barra apilada
 
-```{r function-barra_apilada_1}
+```{r function-barra_apilada}
 
 #' Funcion para realizar un grafico de barra apilada de 1 variable.
 #' 
@@ -329,156 +468,339 @@ data_prueba %>%
 #' @examples
 #' @export
 
-barra_apilada_1<-function(data, var){
-
-  tag<-
-    data %>%
-    select({{var}}) %>%
-    nrow()
-
-  pop<-as.character(lazyeval::lazy(var))[1]
-
-  labels<-
-    tibble(
-      numero=as.character(unlist(sjlabelled::get_values(data[,pop]), use.names = FALSE)),
-      nombres=unlist(sjlabelled::get_labels(data[,pop]), use.names = FALSE),
-    ) %>%
-    filter(numero!=0)
-
-  colores<-colorRampPalette(c("#F4B183","#FFD966", "#B0D597", "#8FC36B"))
-
-  num_colores<-labels %>%
-    nrow()
-
-  tablon<-data %>%
-
-    mutate(
-      nombres= sjlabelled::as_label({{var}})
-    ) %>%
-
-    #Tabla
-    select(numero={{var}}, nombres) %>%
-    drop_na(numero) %>%
-    filter(numero!=0) %>%
-    dplyr::group_by(numero, nombres) %>%
-    dplyr::summarize(Freq = n()) %>%
-    ungroup() %>%
-    dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),
-                  numero = as.character(numero),
-                  nombres = as.character(nombres)) %>%
-
-    full_join(labels) %>%
-    mutate(across(where(is.numeric), ~replace_na(.,0))) %>%
-
-    mutate(
-
-      color=colores(num_colores)[as.numeric(numero)],
-
-      total="total"
-    ) %>%
-
-    mutate(
-      numero2=case_when(
-        numero %in% as.character(num_colores-1) ~ as.character(num_colores),
-        TRUE ~ numero),
-
-
-    ) %>%
-    group_by(total, numero2) %>%
-    mutate(prop2=sum(prop)) %>%
-    ungroup()
-
-  tablon %>%
-
-    #Gráfico
-    ggplot(aes(total, prop, label = scales::percent(prop, accuracy = 1) )) +
-    geom_col(aes(fill=factor(color, ordered = TRUE, levels = rev(colores(num_colores)) )), position = "fill", width = 0.6) +
-
-    #Etiqueta = 4
-    geom_text(aes(y=1.05, label = ifelse((numero == 4 & prop < 0.07) & !(numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060",
-              family="sans") +
-
-    #Etiqueta = 3
-    geom_text(aes(y=1.05, label = ifelse((numero == 3 & prop < 0.07) & !(numero == 3 & prop == 0) & (numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060",
-              family="sans") +
-
-    #Etiqueta = 2
-    geom_text(aes(y=-0.05, label = ifelse((numero == 2 & prop < 0.07) & !(numero == 2 & prop == 0) & (numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060",
-              family="sans") +
-
-    #Etiqueta = 1
-    geom_text(aes(y=-0.05, label = ifelse((numero == 1 & prop < 0.07) & !(numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060",
-              family="sans") +
-
-    #Etiqueta = El resto
-    geom_text(aes(label = ifelse(!((numero == 4 & prop < 0.07) |
-                                     (numero == 3 & prop < 0.07) & (numero == 4 & prop == 0) |
-                                     (numero == 2 & prop < 0.07) & (numero == 1 & prop == 0) |
-                                     (numero == 1 & prop < 0.07)) & !(prop == 0), scales::percent(prop, accuracy = 1), "") ),
-              position = position_stack(vjust = 0.5),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060",
-              family="sans") +
-
-    #TOP2BOX
-    geom_label(aes(y=1.2, label=ifelse(numero2 %in% "4", scales::percent(prop2, accuracy = 1), NA)),
+barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE, ext.label=42){
+  
+  switch<-
+    data %>% 
+    select(...) %>% 
+    names() %>% 
+    table() %>% 
+    sum() %>% 
+    as.numeric()
+  
+  if(switch %in% 1){   
+    
+    #Barra apilada de 1
+    
+    total<-nrow(data)
+    
+    tag<-
+      data %>%
+      filter({{filtrar}}) %>% 
+      select(...) %>%
+      nrow()
+    
+    pop<-
+      data %>% 
+      select(...) %>% 
+      names()
+    
+    labels<-
+      tibble(
+        numero=as.character(unlist(sjlabelled::get_values(data[,pop]), use.names = FALSE)),
+        nombres=unlist(sjlabelled::get_labels(data[,pop]), use.names = FALSE),
+      ) %>%
+      filter(numero!=0)
+    
+    colores<-colorRampPalette(c("#F4B183","#FFD966", "#B0D597", "#8FC36B"))
+    
+    num_colores<-labels %>%
+      nrow()
+    
+    tablon<-data %>%
+      filter({{filtrar}}) %>% 
+      select(...) %>% 
+      rename(nombres=everything()) %>% 
+      mutate(numero=nombres,
+             nombres=sjlabelled::as_label(nombres)) %>% 
+      drop_na(numero) %>%
+      filter(numero!=0) %>%
+      dplyr::group_by(numero, nombres) %>%
+      dplyr::summarize(Freq = n()) %>%
+      ungroup() %>%
+      dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),
+                    numero = as.character(numero),
+                    nombres = as.character(nombres)) %>%
+      
+      full_join(labels) %>%
+      mutate(across(where(is.numeric), ~replace_na(.,0))) %>%
+      
+      mutate(
+        
+        color=colores(num_colores)[as.numeric(numero)],
+        
+        total="total"
+      ) %>%
+      
+      mutate(
+        numero2=case_when(
+          numero %in% as.character(num_colores-1) ~ as.character(num_colores),
+          TRUE ~ numero),
+        
+        
+      ) %>%
+      group_by(total, numero2) %>%
+      mutate(prop2=sum(prop)) %>%
+      ungroup()
+    
+    tablon %>%
+      
+      #Gráfico
+      ggplot(aes(total, prop, label = if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)}else{scales::number(prop, scale = 100, accuracy = 1)} )) +
+      geom_col(aes(fill=factor(color, ordered = TRUE, levels = rev(colores(num_colores)) )), position = "fill", width = 0.4) +
+      
+      #Etiqueta max <7%
+      geom_text(aes(y=1.05, label = ifelse((numero == (max(as.numeric(numero))) & prop < 0.07) & !(numero == (max(as.numeric(numero))) & prop == 0), if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)} else {scales::number(prop, scale = 100, accuracy = 1)}, "") ),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060",
+                family="sans") +
+      
+      #Etiqueta min <7%
+      geom_text(aes(y=-0.05, label = ifelse((numero == (min(as.numeric(numero))) & prop < 0.07) & !(numero == (min(as.numeric(numero))) & prop == 0), if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)} else {scales::number(prop, scale = 100, accuracy = 1)}, "") ),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060",
+                family="sans") +
+      
+      #Etiqueta = El resto planeo usar ggrepel
+      geom_text(aes(label = ifelse(!((numero == (max(as.numeric(numero))) & prop < 0.07) |
+                                     (numero == (min(as.numeric(numero))) & prop < 0.07)) & !(prop == 0), if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)} else {scales::number(prop, scale = 100, accuracy = 1)}, "") ),
+                position = position_stack(vjust = 0.5),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060",
+                family="sans") +
+      
+      #TOP2BOX
+      geom_label(aes(y=1.2, label=ifelse(numero2 == (max(as.numeric(numero2))), if(isTRUE(porcentaje)){scales::percent(prop2, accuracy = 1)} else {scales::number(prop2, scale = 100, accuracy = 1)}, NA)),
+                 size = 3.5,
+                 fontface = "bold",
+                 color = "#459847",
+                 family="sans") +
+      annotate("text", label="TOP2BOX", x=0, y = 1.2, vjust = -12,
                size = 3.5,
                fontface = "bold",
                color = "#459847",
                family="sans") +
-    annotate("text", label="TOP2BOX", x=0, y = 1.2, vjust = -9,
-             size = 3.5,
-             fontface = "bold",
-             color = "#459847",
-             family="sans") +
-
-    #eje x y
-    scale_y_continuous(labels = scales::percent, limits = c(-0.05, 1.3)) +
-    scale_fill_identity(labels=str_wrap(levels(fct_reorder(tablon$nombres, tablon$numero, min)), width = 20), breaks= levels(droplevels(factor(tablon$color, ordered = TRUE, levels = colores(num_colores) ))), guide="legend") +
-    coord_flip(clip="off", ylim = c(-0.05, 1.3)) +
-
-    #temas
-    theme_pubr() +
-    labs(caption = "Elaborado por Pulso PUCP",
-         tag = glue("N=",tag)
-    ) +
-    theme(legend.title = element_blank(),legend.position = "bottom",legend.text = element_text(size = 7, face = "bold",family="sans"),legend.key.height = unit(.2, "cm"),
-          plot.caption = element_text(face = "italic",family="sans"),plot.margin = unit(c(0,0,1,0),"cm"),plot.tag = element_text(size = 8, color="grey40"),plot.tag.position = "topright",
-          text = element_text(size = 9, color="#002060",family="sans"),
-          axis.title = element_blank(),axis.text = element_blank(),axis.ticks = element_blank(),axis.line = element_blank() ) +
-    guides(fill = guide_legend(reverse=FALSE,label.position = "bottom"))
-
+      
+      #eje x y
+      scale_y_continuous(labels = if(isTRUE(porcentaje)) {~scales::percent(.x, accuracy = 1)} else {~scales::number(.x, scale = 100, accuracy = 1)}, limits = c(-0.05, 1.3)) + #c(-0.05, 1.3)  c(-5, 130)) labels = scales::percent ACA PUEDE HABER PROBLEM
+      scale_fill_identity(labels=str_wrap(levels(fct_reorder(tablon$nombres, tablon$numero, min)), width = 20), breaks= levels(droplevels(factor(tablon$color, ordered = TRUE, levels = colores(num_colores) ))), guide="legend") +
+      coord_flip(clip="off", ylim = c(-0.05, 1.5)) +
+      
+      #temas
+      theme_pubr() +
+      labs(subtitle = if(isTRUE(porcentaje)){waiver()} else {"Resultados en porcentajes"},
+           caption = "Elaborado por Pulso PUCP",
+           tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} ) +
+      
+      theme(text = element_text(size = 9, color="#002060",family="sans"),
+            
+            legend.title = element_blank(),
+            legend.position = c(0.1, 0.2), #izq-der,top-down
+            legend.justification = c("left"),
+            legend.text = element_text(size = 7, face = "bold",family="sans"),
+            legend.key.height = unit(.2, "cm"),
+            legend.margin=margin(t=1, b=1), # legend.box.margin=margin(-10,-10,-10,-10),
+            
+            plot.subtitle = element_text(size = 10, color="#002060"),
+            plot.title.position = "plot",
+            
+            plot.caption = element_text(face = "italic",family="sans"),
+            plot.margin = unit(c(0,0,0,0),"cm"),#trbl
+            
+            plot.tag = element_text(size = 8, color="grey40"),
+            plot.tag.position = "bottomleft",
+            
+            axis.title = element_blank(),
+            axis.text = element_blank(),
+            axis.ticks = element_blank(),
+            axis.line = element_blank() ) +
+  
+      guides(fill = guide_legend(reverse=FALSE,label.position = "right", nrow = 1))
+    
+  } else {
+  
+    #Barra apilada n 
+    
+    total<-nrow(data)
+    
+    tag<-
+      data %>%
+      filter({{filtrar}}) %>%
+      select(...) %>%
+      nrow()
+    
+    nombres_orden<-
+      data %>%
+      select(...)%>%
+      sjlabelled::label_to_colnames() %>%
+      names()
+    
+    nombres_orden<-ordered(factor(nombres_orden))
+    
+    noms<-
+      data %>%
+      select(...) %>%
+      names()
+    
+    pop<-as.character(noms)
+    
+    labels <- tibble(
+      pregunta = sort(rep(as.character(unlist(sjlabelled::get_label(data[,pop]), use.names = FALSE)), 
+                          sum(nchar(unique(as.numeric(unlist(sjlabelled::get_values(data[,pop]), use.names = FALSE))))))), 
+      
+      numero = as.character(unlist(sjlabelled::get_values(data[,pop]), use.names = FALSE)), 
+      
+      nombres = unlist(sjlabelled::get_labels(data[,pop]), use.names = FALSE), ) %>% 
+      
+      filter(numero != 0)
+    
+    colores<-colorRampPalette(c("#F4B183","#FFD966", "#B0D597", "#8FC36B"))
+    
+    num_colores<-
+      labels %>%
+      select(nombres) %>% 
+      distinct() %>% 
+      nrow()
+    
+    #Tabla
+    tablon<-
+      
+      data %>%
+      filter({{filtrar}}) %>%
+      select(...)%>%
+      sjlabelled::label_to_colnames() %>%
+      pivot_longer(everything(), names_to = "pregunta", values_to = "numero") %>%
+      mutate(nombres=sjlabelled::as_label(numero)) %>%
+      group_by(pregunta, numero, nombres) %>%
+      drop_na(numero) %>%
+      filter(numero!=0) %>%
+      dplyr::summarize(Freq = n()) %>%
+      group_by(pregunta) %>%
+      dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),
+                    numero = as.character(numero),
+                    nombres = as.character(nombres)) %>%
+      
+      full_join(labels) %>%
+      mutate(across(where(is.numeric), ~replace_na(.,0))) %>%
+      
+      mutate(
+        
+        color=colores(num_colores)[as.numeric(numero)],
+        
+      ) %>%
+      
+      mutate(
+        numero2=case_when(
+          numero %in% as.character(num_colores-1) ~ as.character(num_colores),
+          TRUE ~ numero),
+        
+        
+      ) %>%
+      group_by(pregunta, numero2) %>%
+      mutate(prop2=sum(prop)) %>%
+      ungroup()
+    
+    tablon %>%
+      
+      #Gráfico
+      ggplot(aes(x=if(isTRUE(ordenado)){fct_reorder2(pregunta, numero, -prop2)}else{fct_rev(factor(pregunta, levels = nombres_orden))}, y=prop, label = if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)}else{scales::number(prop, scale = 100, accuracy = 1)} )) +
+      geom_col(aes(fill=factor(color, ordered = TRUE, levels = rev(colores(num_colores)) )), position = "fill", width = 0.6) +
+      
+      #Etiqueta max <7%
+      geom_text(aes(y=1.05, label = ifelse((numero == (max(as.numeric(numero))) & prop < 0.07) & !(numero == (max(as.numeric(numero))) & prop == 0), if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)} else {scales::number(prop, scale = 100, accuracy = 1)}, "") ),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060",
+                family="sans") +
+      
+      #Etiqueta min <7%
+      geom_text(aes(y=-0.05, label = ifelse((numero == (min(as.numeric(numero))) & prop < 0.07) & !(numero == (min(as.numeric(numero))) & prop == 0), if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)} else {scales::number(prop, scale = 100, accuracy = 1)}, "") ),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060",
+                family="sans") +
+      
+      #Etiqueta = El resto planeo usar ggrepel
+      geom_text(aes(label = ifelse(!((numero == (max(as.numeric(numero))) & prop < 0.07) |
+                                       (numero == (min(as.numeric(numero))) & prop < 0.07)) & !(prop == 0), if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)} else {scales::number(prop, scale = 100, accuracy = 1)}, "") ),
+                position = position_stack(vjust = 0.5),
+                size = 3.5,
+                fontface = "bold",
+                color = "#002060",
+                family="sans") +
+      
+      #TOP2BOX
+      geom_label(aes(y=1.2, label=ifelse(numero2 == (max(as.numeric(numero2))), if(isTRUE(porcentaje)){scales::percent(prop2, accuracy = 1)} else {scales::number(prop2, scale = 100, accuracy = 1)}, NA)),
+                 size = 3.5,
+                 fontface = "bold",
+                 color = "#459847",
+                 family="sans") +
+      annotate("text", label="TOP2BOX", x=as.numeric(count(as.data.frame(unique(tablon$pregunta)))), y = 1.2, vjust = -3,
+               size = 3.5,
+               fontface = "bold",
+               color = "#459847",
+               family="sans") +
+      
+      #eje x y
+      scale_x_discrete(labels = wrap_format(ext.label)) +
+      scale_y_continuous(labels = if(isTRUE(porcentaje)) {~scales::percent(.x, accuracy = 1)} else {~scales::number(.x, scale = 100, accuracy = 1)}, limits = c(-0.05, 1.3)) +
+      scale_fill_identity(labels=str_wrap(levels(fct_reorder(tablon$nombres, tablon$numero, min)), width = 20), breaks= levels(droplevels(factor(tablon$color, ordered = TRUE, levels = c("#D3D3D3","#F4B183","#FFD966","#B0D597","#8FC36B")))), guide="legend") +
+      coord_flip(clip="off", ylim = c(-0.05, 1.3)) +
+      
+      #temas
+      theme_pubr() +
+      labs(subtitle = if(isTRUE(porcentaje)){waiver()} else {"Resultados en porcentajes"},
+           caption = "Elaborado por Pulso PUCP",
+           tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} ) +
+      
+      theme(text = element_text(size = 9, color="#002060",family="sans"),
+            
+            legend.title = element_blank(),
+            legend.position = c(0.1, -0.05), #izq-der,top-down,
+            legend.text = element_text(size = 7, face = "bold",family="sans"),
+            legend.key.height = unit(.2, "cm"),
+            
+            plot.subtitle = element_text(size = 10, color="#002060"),
+            plot.title.position = "plot",
+            
+            plot.caption = element_text(face = "italic",family="sans"),
+            plot.margin = unit(c(t=0,r=0,b=1,l=0),"cm"),
+            
+            plot.tag = element_text(size = 8, color="grey40"),
+            plot.tag.position = "bottomleft",
+            
+            axis.title = element_blank(),
+            axis.text = element_text(color="#002060"),
+            axis.text.y = element_text(hjust=0.5),
+            axis.text.x = element_blank(),
+            axis.ticks = element_blank(),
+            axis.line = element_blank() ) +
+       
+      guides(fill = guide_legend(reverse=FALSE,label.position = "right", nrow = 1))
+  
+  }
+  
 }
 
 
 ```
 
-```{r examples-barra_apilada_1, eval=FALSE}
+```{r examples-barra_apilada, eval=FALSE}
 
-data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
-data_prueba <- haven::read_sav(data_prueba_ruta)
-
-data_prueba %>% 
-  filter(q0002 %in% 1) %>% 
-  barra_apilada_1(q0003_0002)
+# data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+# data_prueba <- haven::read_sav(data_prueba_ruta)
+# 
+# data_prueba %>% 
+#   filter(q0002 %in% 1) %>% 
+#   barra_apilada_1(q0003_0002)
 
 
 ```
 
-```{r tests-barra_apilada_1}
+```{r tests-barra_apilada}
 
 # test_that("barra_apilada_1 works", {
 #   expect_error(data_prueba %>% 
@@ -488,7 +810,7 @@ data_prueba %>%
 
 ```
 
-# Barra apilada n
+# Barra apilada n (se descontinuará)
 
 ```{r function-barra_apilada_n}
 
@@ -496,10 +818,10 @@ data_prueba %>%
 #' 
 #' @param data Base de datos para la funcion
 #' @param ... Variables para el grafico de barra apilada
+#' @import tidyverse
 #' @import glue
 #' @import sjlabelled
 #' @import testthat
-#' @import tidyverse
 #' @import janitor
 #' @import glue
 #' @import lubridate
@@ -688,11 +1010,11 @@ barra_apilada_n<-function(data, ..., ordenado=TRUE){
 
 ```{r examples-barra_apilada_n, eval=FALSE}
 
-data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
-data_prueba <- haven::read_sav(data_prueba_ruta)
-
-data_prueba %>% 
-  barra_apilada_n(starts_with("q0011_"))
+# data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+# data_prueba <- haven::read_sav(data_prueba_ruta)
+# 
+# data_prueba %>% 
+#   barra_apilada_n(starts_with("q0011_"))
 
 ```
 
@@ -713,10 +1035,10 @@ data_prueba %>%
 #' 
 #' @param data Base de datos para la funcion
 #' @param var Variable para gráfico donut
+#' @import tidyverse
 #' @import glue
 #' @import sjlabelled
 #' @import testthat
-#' @import tidyverse
 #' @import janitor
 #' @import glue
 #' @import lubridate
@@ -791,7 +1113,7 @@ grafico_donut<- function(data, var, paleta=1, direction=1) {
           text = element_text(size = 9, color="#002060",family="sans"),
           plot.caption = element_text(face = "italic",family="sans"),
           plot.tag = element_text(size = 8, color="grey40"),
-          plot.tag.position = "topright") +
+          plot.tag.position = "bottomleft") +
     labs(caption = "Elaborado por Pulso PUCP",
          tag = glue("N=",tag))
 
@@ -803,15 +1125,147 @@ grafico_donut<- function(data, var, paleta=1, direction=1) {
 
 ```{r examples-grafico_donut, eval=FALSE}
 
-data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
-data_prueba <- haven::read_sav(data_prueba_ruta)
-
-data_prueba %>% 
-  grafico_donut(sexo)
+# data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+# data_prueba <- haven::read_sav(data_prueba_ruta)
+# 
+# data_prueba %>% 
+#   grafico_donut(sexo)
 
 ```
 
 ```{r tests-grafico_donut}
+
+# test_that("grafico_donut works", {
+#   expect_error(data_prueba %>% 
+#   grafico_donut(sexo), regexp = NA)
+# })
+
+```
+
+# Grafico pie
+
+```{r function-grafico_pie}
+
+#' Funcion para realizar un grafico pie
+#' 
+#' @param data Base de datos para la funcion
+#' @param var Variable para gráfico pie
+#' @import tidyverse
+#' @import glue
+#' @import sjlabelled
+#' @import testthat
+#' @import janitor
+#' @import glue
+#' @import lubridate
+#' @import scales
+#' @import Hmisc
+#' @import lazyeval
+#' @import plotly
+#' @import ggrepel
+#' @import cowplot
+#' @import grid
+#' @import fmsb
+#' @import haven
+#' @import rio
+#' @import officer
+#' @import officedown
+#' @import sjlabelled
+#' @import flextable
+#' @import knitr
+#' @import kableExtra
+#' @import DT
+#' @import gtsummary
+#' @import ggpubr
+#' @import paletteer
+#' @import RColorBrewer
+#' @import grDevices
+#' @import graphics
+#' @import utils
+#' @return Un grafico pie
+#' @examples
+#' @export
+
+grafico_pie<- function(data, var, filtrar=TRUE, color1="#A9D18E",color2="#FF9393") {
+  
+  total<-
+    data %>% 
+    nrow()
+  
+  tag<-
+    data %>%
+    filter({{filtrar}}) %>% 
+    sjlabelled::as_label() %>%
+    select({{var}}) %>%
+    nrow()
+  
+  data<-
+    data %>%
+    filter({{filtrar}}) %>% 
+    sjlabelled::as_label() %>%
+    group_by({{var}}) %>%
+    count() %>%
+    rename(count=n) %>%
+    ungroup()
+    
+  colores<-colorRampPalette(c(color1,color2))
+  
+  num_colores<-
+    data %>%
+    nrow()
+  
+  color=colores(num_colores)
+    
+  data %>% 
+    mutate(prop=paste0(round_half_up(count/sum(count), digits = 2)*100, "%"),
+           # Compute percentages
+           fraction=count/sum(count),
+           # Compute the cumulative percentages (top of each rectangle)
+           ymax=cumsum(fraction),
+           # Compute the bottom of each rectangle
+           ymin=c(0, head(ymax, n=-1)),
+           # Compute label position
+           labelPosition=(ymax + ymin) / 2,
+           # Compute a good label
+           label=paste0({{var}}, "\n ", prop),
+    ) %>%
+    # Make the plot
+    ggplot(aes(ymax=ymax, ymin=ymin, xmax=4, xmin=0, fill={{var}})) +
+    geom_rect(colour="white", size=2) +
+    geom_text( x=2.5, aes(y=labelPosition, label=label),
+               hjust="middle",
+               size = 3.5,
+               fontface = "bold",
+               color = "#002060",
+               family="sans") +
+    scale_fill_manual(values=c(color)) +
+    coord_polar(theta="y", start=0) +
+    xlim(c(0, 4)) +
+    theme_void() +
+    theme(legend.position = "none",
+          text = element_text(size = 9, color="#002060",family="sans"),
+          plot.caption = element_text(face = "italic",family="sans"),
+          plot.tag = element_text(size = 8, color="grey40"),
+          plot.tag.position = "bottomleft") +
+    labs(caption = "Elaborado por Pulso PUCP",
+         tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} )
+  
+  
+}
+
+
+```
+
+```{r examples-grafico_pie, eval=FALSE}
+
+# data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+# data_prueba <- haven::read_sav(data_prueba_ruta)
+# 
+# data_prueba %>% 
+#   grafico_donut(sexo)
+
+```
+
+```{r tests-grafico_pie}
 
 # test_that("grafico_donut works", {
 #   expect_error(data_prueba %>% 
@@ -827,10 +1281,10 @@ data_prueba %>%
 #' Funcion para realizar un grafico radar
 #' 
 #' @param data Base de datos para la funcion
+#' @import tidyverse
 #' @import glue
 #' @import sjlabelled
 #' @import testthat
-#' @import tidyverse
 #' @import janitor
 #' @import glue
 #' @import lubridate
@@ -1371,57 +1825,57 @@ grafico_radar<- function (plot.data, base.size = 20, webtype = "mini",
 
 ```{r examples-grafico_radar, eval=FALSE}
 
-data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
-data_prueba <- haven::read_sav(data_prueba_ruta)
-
-radar<-
-  data_prueba %>% 
-  select(starts_with("q0008_")) %>% 
-  sjlabelled::label_to_colnames() %>%
-  pivot_longer(everything(), names_to = "pregunta", values_to = "numero") %>%
-  mutate(nombres=sjlabelled::as_label(numero)) %>% 
-  group_by(pregunta, numero, nombres) %>%
-  dplyr::summarize(Freq = n()) %>% 
-  group_by(pregunta) %>% 
-  dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),
-                numero = as.character(numero),
-                nombres = as.character(nombres)) %>% 
-  separate(pregunta, c("Servicio","group", NA),  sep=" - ") %>% 
-  filter(nombres!="No") %>%
-  select(-c(numero, nombres, Freq)) %>%
-  group_by(group) %>% 
-  pivot_wider(names_from = Servicio, values_from = prop) %>% 
-  mutate(
-   group=case_when(
-    group %in% "Conoce este servicio de bienestar que brinda la universidad" ~ "Lo conoce",
-    TRUE ~ group)
-  ) %>% 
-  ungroup()
-
-radar.tag<-
-  data_prueba %>% 
-  select(starts_with("q0008_")) %>% 
-  nrow()
-
-radar %>% 
-  select(group, `Servicio de Salud`, `Servicio de actividad fisica y deportes`, `Bienestar psicologico`, `Servicios Culturales`) %>% 
-  grafico_radar(polygonfill = FALSE,
-         grid.label.size = 3,
-         axis.label.size = 3,
-         group.line.width = 1,
-         fullscore = as.numeric(rep(1,ncol(.)-1))
-         ) + 
-  
-  labs(caption = "Elaborado por Pulso PUCP",
-       tag = glue("N=",radar.tag)) +
-  
-  theme(legend.title = element_blank(),legend.position = "bottom",legend.text = element_text(size=10, face = "bold",family="sans"),legend.key.height = unit(.2, "cm"),
-        plot.caption = element_text(face = "italic",family="sans"),plot.margin = unit(c(0,0,1,0),"cm"),plot.tag = element_text(size = 8, color="grey40"),plot.tag.position = "topright",
-        
-        text = element_text(size = 9, color="#002060",family="sans"),
-        ) +
-  guides(color=guide_legend(nrow = 2, byrow = TRUE)) +
-  coord_equal(clip="off")
+# data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
+# data_prueba <- haven::read_sav(data_prueba_ruta)
+# 
+# radar<-
+#   data_prueba %>% 
+#   select(starts_with("q0008_")) %>% 
+#   sjlabelled::label_to_colnames() %>%
+#   pivot_longer(everything(), names_to = "pregunta", values_to = "numero") %>%
+#   mutate(nombres=sjlabelled::as_label(numero)) %>% 
+#   group_by(pregunta, numero, nombres) %>%
+#   dplyr::summarize(Freq = n()) %>% 
+#   group_by(pregunta) %>% 
+#   dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),
+#                 numero = as.character(numero),
+#                 nombres = as.character(nombres)) %>% 
+#   separate(pregunta, c("Servicio","group", NA),  sep=" - ") %>% 
+#   filter(nombres!="No") %>%
+#   select(-c(numero, nombres, Freq)) %>%
+#   group_by(group) %>% 
+#   pivot_wider(names_from = Servicio, values_from = prop) %>% 
+#   mutate(
+#    group=case_when(
+#     group %in% "Conoce este servicio de bienestar que brinda la universidad" ~ "Lo conoce",
+#     TRUE ~ group)
+#   ) %>% 
+#   ungroup()
+# 
+# radar.tag<-
+#   data_prueba %>% 
+#   select(starts_with("q0008_")) %>% 
+#   nrow()
+# 
+# radar %>% 
+#   select(group, `Servicio de Salud`, `Servicio de actividad fisica y deportes`, `Bienestar psicologico`, `Servicios Culturales`) %>% 
+#   grafico_radar(polygonfill = FALSE,
+#          grid.label.size = 3,
+#          axis.label.size = 3,
+#          group.line.width = 1,
+#          fullscore = as.numeric(rep(1,ncol(.)-1))
+#          ) + 
+#   
+#   labs(caption = "Elaborado por Pulso PUCP",
+#        tag = glue("N=",radar.tag)) +
+#   
+#   theme(legend.title = element_blank(),legend.position = "bottom",legend.text = element_text(size=10, face = "bold",family="sans"),legend.key.height = unit(.2, "cm"),
+#         plot.caption = element_text(face = "italic",family="sans"),plot.margin = unit(c(0,0,1,0),"cm"),plot.tag = element_text(size = 8, color="grey40"),plot.tag.position = "bottomleft",
+#         
+#         text = element_text(size = 9, color="#002060",family="sans"),
+#         ) +
+#   guides(color=guide_legend(nrow = 2, byrow = TRUE)) +
+#   coord_equal(clip="off")
 
 
 ```
