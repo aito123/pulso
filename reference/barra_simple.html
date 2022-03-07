@@ -51,10 +51,14 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">barra_simple</span><span class="op">(</span>
   <span class="va">data</span>,
   <span class="va">var</span>,
+  filtrar <span class="op">=</span> <span class="cn">TRUE</span>,
   ordenado <span class="op">=</span> <span class="cn">TRUE</span>,
+  frecuencia <span class="op">=</span> <span class="cn">FALSE</span>,
+  porcentaje <span class="op">=</span> <span class="cn">TRUE</span>,
+  ultimo <span class="op">=</span> <span class="cn">NULL</span>,
   max.limit <span class="op">=</span> <span class="fl">1</span>,
   color <span class="op">=</span> <span class="st">"#B0D597"</span>,
-  ultimo <span class="op">=</span> <span class="cn">NULL</span>
+  ext.label <span class="op">=</span> <span class="fl">30</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -64,6 +68,22 @@
 <dd><p>Base de datos para la funcion</p></dd>
 <dt>var</dt>
 <dd><p>Variable para el grafico de barras simple</p></dd>
+<dt>filtrar</dt>
+<dd><p>Por default TRUE que significa ningún filtro, si se quiere filtrar por una variable especificar la variable y el valor a filtrar (ej: filtrar = q0002 == 1 que significa filtrar la base para que aparezcan solo los casos que tienen en la pregunta q0002 el valor de 1).</p></dd>
+<dt>ordenado</dt>
+<dd><p>Por default es TRUE, significa que ordena las barras de menor a mayor, cambiar a FALSE para dejarlas en el orden original.</p></dd>
+<dt>frecuencia</dt>
+<dd><p>Por default es FALSE, cambiar a TRUE para visualizar los resultados en frecuencias y no en porcentajes.</p></dd>
+<dt>porcentaje</dt>
+<dd><p>Por default es TRUE, cambiar a FALSE para visualizar los resultados de porcentajes sin el simbolo %.</p></dd>
+<dt>ultimo</dt>
+<dd><p>Por default es NULL, escribir entre comillas la palabra que quieres que vaya al final de las barras (ej: ultimo="Otros")</p></dd>
+<dt>max.limit</dt>
+<dd><p>Por default es 1, es el limite máximo del eje x. 1=100 cuando son resultados en porcentajes (ej: max.limit=0.75 significa maximo 75%). Aunque el porcentaje esté en FALSE, el max.limit debe ser tratado como si 1.00 fuera el maximo y no como si 100 fuera el maximo.</p></dd>
+<dt>color</dt>
+<dd><p>Por default es color azul que es "#B0D597" en notacion hexagesimal. Buscar colores hex para más información. También permite colores grabados en R como "red".</p></dd>
+<dt>ext.label</dt>
+<dd><p>Por default es 30, a menor el número menor espacio para el texto de las etiquetas.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -73,9 +93,9 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="va">data_prueba</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">barra_simple</span><span class="op">(</span><span class="va">gedad</span>, ordenado<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in count(., var = fct_rev(factor({    {        var    }}))):</span> could not find function "count"</span>
+<span class="r-in"><span class="co"># data_prueba %&gt;% </span></span>
+<span class="r-in"><span class="co">#   barra_simple(gedad, ordenado=FALSE)</span></span>
+<span class="r-in"></span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>

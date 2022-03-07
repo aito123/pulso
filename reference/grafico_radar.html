@@ -106,60 +106,58 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="va">data_prueba_ruta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"data_prueba.sav"</span>, package <span class="op">=</span> <span class="st">"pulso"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">data_prueba</span> <span class="op">&lt;-</span> <span class="fu">haven</span><span class="fu">::</span><span class="fu"><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">read_sav</a></span><span class="op">(</span><span class="va">data_prueba_ruta</span><span class="op">)</span></span>
+<span class="r-in"><span class="co"># data_prueba_ruta &lt;- system.file("data_prueba.sav", package = "pulso")</span></span>
+<span class="r-in"><span class="co"># data_prueba &lt;- haven::read_sav(data_prueba_ruta)</span></span>
+<span class="r-in"><span class="co"># </span></span>
+<span class="r-in"><span class="co"># radar&lt;-</span></span>
+<span class="r-in"><span class="co">#   data_prueba %&gt;% </span></span>
+<span class="r-in"><span class="co">#   select(starts_with("q0008_")) %&gt;% </span></span>
+<span class="r-in"><span class="co">#   sjlabelled::label_to_colnames() %&gt;%</span></span>
+<span class="r-in"><span class="co">#   pivot_longer(everything(), names_to = "pregunta", values_to = "numero") %&gt;%</span></span>
+<span class="r-in"><span class="co">#   mutate(nombres=sjlabelled::as_label(numero)) %&gt;% </span></span>
+<span class="r-in"><span class="co">#   group_by(pregunta, numero, nombres) %&gt;%</span></span>
+<span class="r-in"><span class="co">#   dplyr::summarize(Freq = n()) %&gt;% </span></span>
+<span class="r-in"><span class="co">#   group_by(pregunta) %&gt;% </span></span>
+<span class="r-in"><span class="co">#   dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),</span></span>
+<span class="r-in"><span class="co">#                 numero = as.character(numero),</span></span>
+<span class="r-in"><span class="co">#                 nombres = as.character(nombres)) %&gt;% </span></span>
+<span class="r-in"><span class="co">#   separate(pregunta, c("Servicio","group", NA),  sep=" - ") %&gt;% </span></span>
+<span class="r-in"><span class="co">#   filter(nombres!="No") %&gt;%</span></span>
+<span class="r-in"><span class="co">#   select(-c(numero, nombres, Freq)) %&gt;%</span></span>
+<span class="r-in"><span class="co">#   group_by(group) %&gt;% </span></span>
+<span class="r-in"><span class="co">#   pivot_wider(names_from = Servicio, values_from = prop) %&gt;% </span></span>
+<span class="r-in"><span class="co">#   mutate(</span></span>
+<span class="r-in"><span class="co">#    group=case_when(</span></span>
+<span class="r-in"><span class="co">#     group %in% "Conoce este servicio de bienestar que brinda la universidad" ~ "Lo conoce",</span></span>
+<span class="r-in"><span class="co">#     TRUE ~ group)</span></span>
+<span class="r-in"><span class="co">#   ) %&gt;% </span></span>
+<span class="r-in"><span class="co">#   ungroup()</span></span>
+<span class="r-in"><span class="co"># </span></span>
+<span class="r-in"><span class="co"># radar.tag&lt;-</span></span>
+<span class="r-in"><span class="co">#   data_prueba %&gt;% </span></span>
+<span class="r-in"><span class="co">#   select(starts_with("q0008_")) %&gt;% </span></span>
+<span class="r-in"><span class="co">#   nrow()</span></span>
+<span class="r-in"><span class="co"># </span></span>
+<span class="r-in"><span class="co"># radar %&gt;% </span></span>
+<span class="r-in"><span class="co">#   select(group, `Servicio de Salud`, `Servicio de actividad fisica y deportes`, `Bienestar psicologico`, `Servicios Culturales`) %&gt;% </span></span>
+<span class="r-in"><span class="co">#   grafico_radar(polygonfill = FALSE,</span></span>
+<span class="r-in"><span class="co">#          grid.label.size = 3,</span></span>
+<span class="r-in"><span class="co">#          axis.label.size = 3,</span></span>
+<span class="r-in"><span class="co">#          group.line.width = 1,</span></span>
+<span class="r-in"><span class="co">#          fullscore = as.numeric(rep(1,ncol(.)-1))</span></span>
+<span class="r-in"><span class="co">#          ) + </span></span>
+<span class="r-in"><span class="co">#   </span></span>
+<span class="r-in"><span class="co">#   labs(caption = "Elaborado por Pulso PUCP",</span></span>
+<span class="r-in"><span class="co">#        tag = glue("N=",radar.tag)) +</span></span>
+<span class="r-in"><span class="co">#   </span></span>
+<span class="r-in"><span class="co">#   theme(legend.title = element_blank(),legend.position = "bottom",legend.text = element_text(size=10, face = "bold",family="sans"),legend.key.height = unit(.2, "cm"),</span></span>
+<span class="r-in"><span class="co">#         plot.caption = element_text(face = "italic",family="sans"),plot.margin = unit(c(0,0,1,0),"cm"),plot.tag = element_text(size = 8, color="grey40"),plot.tag.position = "bottomleft",</span></span>
+<span class="r-in"><span class="co">#         </span></span>
+<span class="r-in"><span class="co">#         text = element_text(size = 9, color="#002060",family="sans"),</span></span>
+<span class="r-in"><span class="co">#         ) +</span></span>
+<span class="r-in"><span class="co">#   guides(color=guide_legend(nrow = 2, byrow = TRUE)) +</span></span>
+<span class="r-in"><span class="co">#   coord_equal(clip="off")</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="va">radar</span><span class="op">&lt;-</span></span>
-<span class="r-in">  <span class="va">data_prueba</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">select</span><span class="op">(</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"q0008_"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">sjlabelled</span><span class="fu">::</span><span class="fu"><a href="https://strengejacke.github.io/sjlabelled/reference/label_to_colnames.html" class="external-link">label_to_colnames</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu">pivot_longer</span><span class="op">(</span><span class="fu">everything</span><span class="op">(</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"pregunta"</span>, values_to <span class="op">=</span> <span class="st">"numero"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu">mutate</span><span class="op">(</span>nombres<span class="op">=</span><span class="fu">sjlabelled</span><span class="fu">::</span><span class="fu"><a href="https://strengejacke.github.io/sjlabelled/reference/as_label.html" class="external-link">as_label</a></span><span class="op">(</span><span class="va">numero</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">group_by</span><span class="op">(</span><span class="va">pregunta</span>, <span class="va">numero</span>, <span class="va">nombres</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>Freq <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">group_by</span><span class="op">(</span><span class="va">pregunta</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>prop <span class="op">=</span> <span class="fu">round_half_up</span><span class="op">(</span><span class="va">Freq</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">Freq</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
-<span class="r-in">                numero <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">numero</span><span class="op">)</span>,</span>
-<span class="r-in">                nombres <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">nombres</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">separate</span><span class="op">(</span><span class="va">pregunta</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Servicio"</span>,<span class="st">"group"</span>, <span class="cn">NA</span><span class="op">)</span>,  sep<span class="op">=</span><span class="st">" - "</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">nombres</span><span class="op">!=</span><span class="st">"No"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">numero</span>, <span class="va">nombres</span>, <span class="va">Freq</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span>
-<span class="r-in">  <span class="fu">group_by</span><span class="op">(</span><span class="va">group</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">pivot_wider</span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">Servicio</span>, values_from <span class="op">=</span> <span class="va">prop</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">mutate</span><span class="op">(</span></span>
-<span class="r-in">   group<span class="op">=</span><span class="fu">case_when</span><span class="op">(</span></span>
-<span class="r-in">    <span class="va">group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="st">"Conoce este servicio de bienestar que brinda la universidad"</span> <span class="op">~</span> <span class="st">"Lo conoce"</span>,</span>
-<span class="r-in">    <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">group</span><span class="op">)</span></span>
-<span class="r-in">  <span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in ungroup(.):</span> could not find function "ungroup"</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">radar.tag</span><span class="op">&lt;-</span></span>
-<span class="r-in">  <span class="va">data_prueba</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">select</span><span class="op">(</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"q0008_"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in select(., starts_with("q0008_")):</span> could not find function "select"</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">radar</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">select</span><span class="op">(</span><span class="va">group</span>, <span class="va">`Servicio de Salud`</span>, <span class="va">`Servicio de actividad fisica y deportes`</span>, <span class="va">`Bienestar psicologico`</span>, <span class="va">`Servicios Culturales`</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> </span>
-<span class="r-in">  <span class="fu">grafico_radar</span><span class="op">(</span>polygonfill <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span class="r-in">         grid.label.size <span class="op">=</span> <span class="fl">3</span>,</span>
-<span class="r-in">         axis.label.size <span class="op">=</span> <span class="fl">3</span>,</span>
-<span class="r-in">         group.line.width <span class="op">=</span> <span class="fl">1</span>,</span>
-<span class="r-in">         fullscore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">         <span class="op">)</span> <span class="op">+</span> </span>
-<span class="r-in">  </span>
-<span class="r-in">  <span class="fu">labs</span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"Elaborado por Pulso PUCP"</span>,</span>
-<span class="r-in">       tag <span class="op">=</span> <span class="fu">glue</span><span class="op">(</span><span class="st">"N="</span>,<span class="va">radar.tag</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">  </span>
-<span class="r-in">  <span class="fu">theme</span><span class="op">(</span>legend.title <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span>,legend.position <span class="op">=</span> <span class="st">"bottom"</span>,legend.text <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>size<span class="op">=</span><span class="fl">10</span>, face <span class="op">=</span> <span class="st">"bold"</span>,family<span class="op">=</span><span class="st">"sans"</span><span class="op">)</span>,legend.key.height <span class="op">=</span> <span class="fu">unit</span><span class="op">(</span><span class="fl">.2</span>, <span class="st">"cm"</span><span class="op">)</span>,</span>
-<span class="r-in">        plot.caption <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>face <span class="op">=</span> <span class="st">"italic"</span>,family<span class="op">=</span><span class="st">"sans"</span><span class="op">)</span>,plot.margin <span class="op">=</span> <span class="fu">unit</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0</span><span class="op">)</span>,<span class="st">"cm"</span><span class="op">)</span>,plot.tag <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">8</span>, color<span class="op">=</span><span class="st">"grey40"</span><span class="op">)</span>,plot.tag.position <span class="op">=</span> <span class="st">"topright"</span>,</span>
-<span class="r-in">        </span>
-<span class="r-in">        text <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">9</span>, color<span class="op">=</span><span class="st">"#002060"</span>,family<span class="op">=</span><span class="st">"sans"</span><span class="op">)</span>,</span>
-<span class="r-in">        <span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">  <span class="fu">guides</span><span class="op">(</span>color<span class="op">=</span><span class="fu">guide_legend</span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">2</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">  <span class="fu">coord_equal</span><span class="op">(</span>clip<span class="op">=</span><span class="st">"off"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in select(., group, `Servicio de Salud`, `Servicio de actividad fisica y deportes`,     `Bienestar psicologico`, `Servicios Culturales`):</span> could not find function "select"</span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 </code></pre></div>
