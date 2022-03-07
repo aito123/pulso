@@ -92,7 +92,7 @@ grafico_pie<- function(data, var, filtrar=TRUE, color1="#A9D18E",color2="#FF9393
     ) %>%
     # Make the plot
     ggplot(aes(ymax=ymax, ymin=ymin, xmax=4, xmin=0, fill={{var}})) +
-    geom_rect(colour="white", size=2) +
+    geom_rect(colour="white", size=1) +
     geom_text( x=2.5, aes(y=labelPosition, label=label),
                hjust="middle",
                size = 3.5,

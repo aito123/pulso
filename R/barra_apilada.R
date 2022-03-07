@@ -159,7 +159,7 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
                  fontface = "bold",
                  color = "#459847",
                  family="sans") +
-      annotate("text", label="TOP2BOX", x=0, y = 1.2, vjust = -12,
+      annotate("text", label="TOP2BOX", x=0, y = 1.2, vjust = -16,
                size = 3.5,
                fontface = "bold",
                color = "#459847",
