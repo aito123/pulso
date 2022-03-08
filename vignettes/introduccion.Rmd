@@ -65,7 +65,7 @@ Este paquete fue creado por Santiago Sotelo.
 
 ```
 
-# Barra apilada n (se descontinuarÃ¡)
+# Barra apilada n (se descontinuara)
 
 ```{r examples-barra_apilada_n, eval = FALSE}
 
