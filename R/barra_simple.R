@@ -98,7 +98,7 @@ barra_simple<- function(data, var, filtrar=TRUE, ordenado=TRUE, frecuencia=FALSE
                 color = "#002060") +
       
       scale_x_discrete(labels = wrap_format(ext.label)) +
-      scale_y_continuous(limits = c(0, if(max.limit==1){max(tablon$n) + round_half_up(max(tablon$n)/3)} else {max.limit} )) +
+      scale_y_continuous(labels=number_format(accuracy =1), limits = c(0, if(max.limit==1){max(tablon$n) + round_half_up(max(tablon$n)/3)} else {max.limit} )) +
       coord_flip() +
       theme_pubr() +
       labs(subtitle = "Resultados en frecuencias",
