@@ -90,7 +90,7 @@ grafico_donut<- function(data, var, paleta=1, direction=1) {
           text = element_text(size = 9, color="#002060",family="sans"),
           plot.caption = element_text(face = "italic",family="sans"),
           plot.tag = element_text(size = 8, color="grey40"),
-          plot.tag.position = "bottomleft") +
+          plot.tag.position = "topright") +
     labs(caption = "Elaborado por Pulso PUCP",
          tag = glue("N=",tag))
 

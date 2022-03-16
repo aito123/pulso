@@ -119,7 +119,7 @@ barra_multiple<-function(data, ..., filtrar=TRUE, abierta=FALSE, frecuencia=FALS
             plot.caption = element_text(face = "italic"),
             
             plot.tag = element_text(size = 8, color="grey40"),
-            plot.tag.position = "bottomleft",
+            plot.tag.position = "topright",
             
             axis.title = element_blank(),
             axis.text = element_text(color="#002060"),
@@ -167,7 +167,7 @@ barra_multiple<-function(data, ..., filtrar=TRUE, abierta=FALSE, frecuencia=FALS
             plot.caption = element_text(face = "italic"),
             
             plot.tag = element_text(size = 8, color="grey40"),
-            plot.tag.position = "bottomleft",
+            plot.tag.position = "topright",
             
             axis.title = element_blank(),
             axis.text = element_text(color="#002060"),

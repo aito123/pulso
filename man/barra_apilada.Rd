@@ -10,7 +10,8 @@ barra_apilada(
   filtrar = TRUE,
   ordenado = TRUE,
   porcentaje = TRUE,
-  ext.label = 42
+  ext.label = 42,
+  base.posicion = 0.35
 )
 }
 \arguments{

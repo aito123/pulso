@@ -49,7 +49,7 @@
 #' 
 #' @export
 
-barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE, ext.label=42){
+barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE, ext.label=42, base.posicion=0.35){
   
   switch<-
     data %>% 
@@ -63,13 +63,18 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
     
     #Barra apilada de 1
     
-    total<-nrow(data)
+    total<-
+      data %>%
+      filter({{filtrar}}) %>% # filtro y lÃ³gica
+      select(...) %>%
+      nrow() 
     
     tag<-
       data %>%
-      filter({{filtrar}}) %>% 
+      filter({{filtrar}}) %>% # filtro y lÃ³gica
       select(...) %>%
-      nrow()
+      filter_all(all_vars(. != 0)) %>% #SIN INF
+      nrow() 
     
     pop<-
       data %>% 
@@ -146,7 +151,7 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
       
       #Etiqueta = El resto planeo usar ggrepel
       geom_text(aes(label = ifelse(!((numero == (max(as.numeric(numero))) & prop < 0.07) |
-                                     (numero == (min(as.numeric(numero))) & prop < 0.07)) & !(prop == 0), if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)} else {scales::number(prop, scale = 100, accuracy = 1)}, "") ),
+                                       (numero == (min(as.numeric(numero))) & prop < 0.07)) & !(prop == 0), if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)} else {scales::number(prop, scale = 100, accuracy = 1)}, "") ),
                 position = position_stack(vjust = 0.5),
                 size = 3.5,
                 fontface = "bold",
@@ -159,11 +164,28 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
                  fontface = "bold",
                  color = "#459847",
                  family="sans") +
-      annotate("text", label="TOP2BOX", x=0, y = 1.2, vjust = -16,
-               size = 3.5,
-               fontface = "bold",
-               color = "#459847",
-               family="sans") +
+      geom_text(y=1.2,
+                label="TOP2BOX",
+                size=3.5,
+                nudge_x = 0.15, #hacia arriba
+                fontface = "bold",
+                color = "#459847",
+                family="sans") +
+      
+      #N Base
+      geom_text(y=1.00, 
+                label=if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)},
+                size = 2.5, 
+                
+                hjust = 1, # a la izquierda del 100%
+                nudge_x = 0.25, #hacia arriba
+                # position = position_stack(vjust = 0.5),
+                
+                # vjust = 0, 
+                # nudge_y = 0.5,
+                
+                color="grey40",
+                family="sans") +
       
       #eje x y
       scale_y_continuous(labels = if(isTRUE(porcentaje)) {~scales::percent(.x, accuracy = 1)} else {~scales::number(.x, scale = 100, accuracy = 1)}, limits = c(-0.05, 1.3)) + #c(-0.05, 1.3)  c(-5, 130)) labels = scales::percent ACA PUEDE HABER PROBLEM
@@ -173,8 +195,7 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
       #temas
       theme_pubr() +
       labs(subtitle = if(isTRUE(porcentaje)){waiver()} else {"Resultados en porcentajes"},
-           caption = "Elaborado por Pulso PUCP",
-           tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} ) +
+           caption = "Elaborado por Pulso PUCP") +
       
       theme(text = element_text(size = 9, color="#002060",family="sans"),
             
@@ -191,27 +212,22 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
             plot.caption = element_text(face = "italic",family="sans"),
             plot.margin = unit(c(0,0,0,0),"cm"),#trbl
             
-            plot.tag = element_text(size = 8, color="grey40"),
-            plot.tag.position = "bottomleft",
-            
             axis.title = element_blank(),
             axis.text = element_blank(),
             axis.ticks = element_blank(),
             axis.line = element_blank() ) +
-  
+      
       guides(fill = guide_legend(reverse=FALSE,label.position = "right", nrow = 1))
     
   } else {
-  
+    
     #Barra apilada n 
     
-    total<-nrow(data)
-    
-    tag<-
+    total<-
       data %>%
-      filter({{filtrar}}) %>%
+      filter({{filtrar}}) %>% # filtro y lÃ³gica
       select(...) %>%
-      nrow()
+      nrow() 
     
     nombres_orden<-
       data %>%
@@ -245,6 +261,21 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
       select(nombres) %>% 
       distinct() %>% 
       nrow()
+    
+    #Tabla sin_inf
+    tablon_sininf<-
+      data %>%
+      filter({{filtrar}}) %>% 
+      select(...)%>%
+      sjlabelled::label_to_colnames() %>%
+      pivot_longer(everything(), names_to = "pregunta", values_to = "numero") %>%
+      mutate(nombres=sjlabelled::as_label(numero)) %>%
+      group_by(pregunta, numero, nombres) %>%
+      drop_na(numero) %>%
+      filter(numero==0) %>%
+      dplyr::summarize(sin_inf = n()) %>%
+      ungroup() %>% 
+      select(-c(numero, nombres))
     
     #Tabla
     tablon<-
@@ -282,7 +313,15 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
       ) %>%
       group_by(pregunta, numero2) %>%
       mutate(prop2=sum(prop)) %>%
-      ungroup()
+      ungroup() %>% 
+      full_join(tablon_sininf) %>%
+      mutate(across(where(is.numeric), ~replace_na(.,0))) %>% 
+      mutate(base_total=case_when(
+        sin_inf == 0 ~ glue("N={total}"),
+        sin_inf != 0 ~ glue("N={total-sin_inf}/{total}"),
+        TRUE ~ ""
+        
+      ))
     
     tablon %>%
       
@@ -319,11 +358,35 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
                  fontface = "bold",
                  color = "#459847",
                  family="sans") +
-      annotate("text", label="TOP2BOX", x=as.numeric(count(as.data.frame(unique(tablon$pregunta)))), y = 1.2, vjust = -3,
-               size = 3.5,
-               fontface = "bold",
-               color = "#459847",
-               family="sans") +
+      # annotate("text", label="TOP2BOX", x=as.numeric(count(as.data.frame(unique(tablon$pregunta)))), y = 1.2, vjust = -3,
+      #          size = 3.5,
+      #          fontface = "bold",
+      #          color = "#459847",
+      #          family="sans") +
+      geom_text(x=as.numeric(count(as.data.frame(unique(tablon$pregunta)))),
+                y=1.2,
+                label="TOP2BOX",
+                size=3.5,
+                vjust = -3,
+                #nudge_x = 0.3, #hacia arriba
+                fontface = "bold",
+                color = "#459847",
+                family="sans") +
+      
+      #N Base
+      geom_text(y=1.00, 
+                aes(label=base_total),
+                size = 2.5, 
+                
+                hjust = 1, # a la izquierda del 100%
+                nudge_x = base.posicion, #hacia arriba
+                # position = position_stack(vjust = 0.5),
+                
+                # vjust = 0, 
+                # nudge_y = 0.5,
+                
+                color="grey40",
+                family="sans") +
       
       #eje x y
       scale_x_discrete(labels = wrap_format(ext.label)) +
@@ -334,8 +397,7 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
       #temas
       theme_pubr() +
       labs(subtitle = if(isTRUE(porcentaje)){waiver()} else {"Resultados en porcentajes"},
-           caption = "Elaborado por Pulso PUCP",
-           tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} ) +
+           caption = "Elaborado por Pulso PUCP" ) +
       
       theme(text = element_text(size = 9, color="#002060",family="sans"),
             
@@ -350,18 +412,15 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
             plot.caption = element_text(face = "italic",family="sans"),
             plot.margin = unit(c(t=0,r=0,b=1,l=0),"cm"),
             
-            plot.tag = element_text(size = 8, color="grey40"),
-            plot.tag.position = "bottomleft",
-            
             axis.title = element_blank(),
             axis.text = element_text(color="#002060"),
             axis.text.y = element_text(hjust=0.5),
             axis.text.x = element_blank(),
             axis.ticks = element_blank(),
             axis.line = element_blank() ) +
-       
+      
       guides(fill = guide_legend(reverse=FALSE,label.position = "right", nrow = 1))
-  
+    
   }
   
 }

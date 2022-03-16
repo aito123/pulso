@@ -107,7 +107,7 @@ grafico_pie<- function(data, var, filtrar=TRUE, color1="#A9D18E",color2="#FF9393
           text = element_text(size = 9, color="#002060",family="sans"),
           plot.caption = element_text(face = "italic",family="sans"),
           plot.tag = element_text(size = 8, color="grey40"),
-          plot.tag.position = "bottomleft") +
+          plot.tag.position = "topright") +
     labs(caption = "Elaborado por Pulso PUCP",
          tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} )
   

@@ -112,7 +112,7 @@ barra_simple<- function(data, var, filtrar=TRUE, ordenado=TRUE, frecuencia=FALSE
             plot.caption = element_text(face = "italic"),
             
             plot.tag = element_text(size = 8, color="grey40"),
-            plot.tag.position = "bottomleft",
+            plot.tag.position = "topright",
             
             axis.title = element_blank(),
             axis.text = element_text(color="#002060"),
@@ -157,7 +157,7 @@ barra_simple<- function(data, var, filtrar=TRUE, ordenado=TRUE, frecuencia=FALSE
             plot.caption = element_text(face = "italic"),
             
             plot.tag = element_text(size = 8, color="grey40"),
-            plot.tag.position = "bottomleft",
+            plot.tag.position = "topright",
             
             axis.title = element_blank(),
             axis.text = element_text(color="#002060"),
