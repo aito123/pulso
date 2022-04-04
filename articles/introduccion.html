@@ -244,6 +244,120 @@
 <span class="co">#   guides(color=guide_legend(nrow = 2, byrow = TRUE)) +</span>
 <span class="co">#   coord_equal(clip="off")</span></code></pre></div>
 </div>
+<div class="section level2">
+<h2 id="tablas-de-cruces">Tablas de cruces<a class="anchor" aria-label="anchor" href="#tablas-de-cruces"></a>
+</h2>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="co"># data_prueba_ruta &lt;- system.file("data_prueba.sav", package = "pulso")</span>
+<span class="co"># data_prueba &lt;- haven::read_sav(data_prueba_ruta)</span>
+<span class="co"># </span>
+<span class="co"># radar&lt;-</span>
+<span class="co">#   data_prueba %&gt;% </span>
+<span class="co">#   select(starts_with("q0008_")) %&gt;% </span>
+<span class="co">#   sjlabelled::label_to_colnames() %&gt;%</span>
+<span class="co">#   pivot_longer(everything(), names_to = "pregunta", values_to = "numero") %&gt;%</span>
+<span class="co">#   mutate(nombres=sjlabelled::as_label(numero)) %&gt;% </span>
+<span class="co">#   group_by(pregunta, numero, nombres) %&gt;%</span>
+<span class="co">#   dplyr::summarize(Freq = n()) %&gt;% </span>
+<span class="co">#   group_by(pregunta) %&gt;% </span>
+<span class="co">#   dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),</span>
+<span class="co">#                 numero = as.character(numero),</span>
+<span class="co">#                 nombres = as.character(nombres)) %&gt;% </span>
+<span class="co">#   separate(pregunta, c("Servicio","group", NA),  sep=" - ") %&gt;% </span>
+<span class="co">#   filter(nombres!="No") %&gt;%</span>
+<span class="co">#   select(-c(numero, nombres, Freq)) %&gt;%</span>
+<span class="co">#   group_by(group) %&gt;% </span>
+<span class="co">#   pivot_wider(names_from = Servicio, values_from = prop) %&gt;% </span>
+<span class="co">#   mutate(</span>
+<span class="co">#    group=case_when(</span>
+<span class="co">#     group %in% "Conoce este servicio de bienestar que brinda la universidad" ~ "Lo conoce",</span>
+<span class="co">#     TRUE ~ group)</span>
+<span class="co">#   ) %&gt;% </span>
+<span class="co">#   ungroup()</span>
+<span class="co"># </span>
+<span class="co"># radar.tag&lt;-</span>
+<span class="co">#   data_prueba %&gt;% </span>
+<span class="co">#   select(starts_with("q0008_")) %&gt;% </span>
+<span class="co">#   nrow()</span>
+<span class="co"># </span>
+<span class="co"># radar %&gt;% </span>
+<span class="co">#   select(group, `Servicio de Salud`, `Servicio de actividad fisica y deportes`, `Bienestar psicologico`, `Servicios Culturales`) %&gt;% </span>
+<span class="co">#   grafico_radar(polygonfill = FALSE,</span>
+<span class="co">#          grid.label.size = 3,</span>
+<span class="co">#          axis.label.size = 3,</span>
+<span class="co">#          group.line.width = 1,</span>
+<span class="co">#          fullscore = as.numeric(rep(1,ncol(.)-1))</span>
+<span class="co">#          ) + </span>
+<span class="co">#   </span>
+<span class="co">#   labs(caption = "Elaborado por Pulso PUCP",</span>
+<span class="co">#        tag = glue("N=",radar.tag)) +</span>
+<span class="co">#   </span>
+<span class="co">#   theme(legend.title = element_blank(),legend.position = "bottom",legend.text = element_text(size=10, face = "bold",family="sans"),legend.key.height = unit(.2, "cm"),</span>
+<span class="co">#         plot.caption = element_text(face = "italic",family="sans"),plot.margin = unit(c(0,0,1,0),"cm"),plot.tag = element_text(size = 8, color="grey40"),plot.tag.position = "bottomleft",</span>
+<span class="co">#         </span>
+<span class="co">#         text = element_text(size = 9, color="#002060",family="sans"),</span>
+<span class="co">#         ) +</span>
+<span class="co">#   guides(color=guide_legend(nrow = 2, byrow = TRUE)) +</span>
+<span class="co">#   coord_equal(clip="off")</span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="salto">Salto<a class="anchor" aria-label="anchor" href="#salto"></a>
+</h2>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="co"># data_prueba_ruta &lt;- system.file("data_prueba.sav", package = "pulso")</span>
+<span class="co"># data_prueba &lt;- haven::read_sav(data_prueba_ruta)</span>
+<span class="co"># </span>
+<span class="co"># radar&lt;-</span>
+<span class="co">#   data_prueba %&gt;% </span>
+<span class="co">#   select(starts_with("q0008_")) %&gt;% </span>
+<span class="co">#   sjlabelled::label_to_colnames() %&gt;%</span>
+<span class="co">#   pivot_longer(everything(), names_to = "pregunta", values_to = "numero") %&gt;%</span>
+<span class="co">#   mutate(nombres=sjlabelled::as_label(numero)) %&gt;% </span>
+<span class="co">#   group_by(pregunta, numero, nombres) %&gt;%</span>
+<span class="co">#   dplyr::summarize(Freq = n()) %&gt;% </span>
+<span class="co">#   group_by(pregunta) %&gt;% </span>
+<span class="co">#   dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),</span>
+<span class="co">#                 numero = as.character(numero),</span>
+<span class="co">#                 nombres = as.character(nombres)) %&gt;% </span>
+<span class="co">#   separate(pregunta, c("Servicio","group", NA),  sep=" - ") %&gt;% </span>
+<span class="co">#   filter(nombres!="No") %&gt;%</span>
+<span class="co">#   select(-c(numero, nombres, Freq)) %&gt;%</span>
+<span class="co">#   group_by(group) %&gt;% </span>
+<span class="co">#   pivot_wider(names_from = Servicio, values_from = prop) %&gt;% </span>
+<span class="co">#   mutate(</span>
+<span class="co">#    group=case_when(</span>
+<span class="co">#     group %in% "Conoce este servicio de bienestar que brinda la universidad" ~ "Lo conoce",</span>
+<span class="co">#     TRUE ~ group)</span>
+<span class="co">#   ) %&gt;% </span>
+<span class="co">#   ungroup()</span>
+<span class="co"># </span>
+<span class="co"># radar.tag&lt;-</span>
+<span class="co">#   data_prueba %&gt;% </span>
+<span class="co">#   select(starts_with("q0008_")) %&gt;% </span>
+<span class="co">#   nrow()</span>
+<span class="co"># </span>
+<span class="co"># radar %&gt;% </span>
+<span class="co">#   select(group, `Servicio de Salud`, `Servicio de actividad fisica y deportes`, `Bienestar psicologico`, `Servicios Culturales`) %&gt;% </span>
+<span class="co">#   grafico_radar(polygonfill = FALSE,</span>
+<span class="co">#          grid.label.size = 3,</span>
+<span class="co">#          axis.label.size = 3,</span>
+<span class="co">#          group.line.width = 1,</span>
+<span class="co">#          fullscore = as.numeric(rep(1,ncol(.)-1))</span>
+<span class="co">#          ) + </span>
+<span class="co">#   </span>
+<span class="co">#   labs(caption = "Elaborado por Pulso PUCP",</span>
+<span class="co">#        tag = glue("N=",radar.tag)) +</span>
+<span class="co">#   </span>
+<span class="co">#   theme(legend.title = element_blank(),legend.position = "bottom",legend.text = element_text(size=10, face = "bold",family="sans"),legend.key.height = unit(.2, "cm"),</span>
+<span class="co">#         plot.caption = element_text(face = "italic",family="sans"),plot.margin = unit(c(0,0,1,0),"cm"),plot.tag = element_text(size = 8, color="grey40"),plot.tag.position = "bottomleft",</span>
+<span class="co">#         </span>
+<span class="co">#         text = element_text(size = 9, color="#002060",family="sans"),</span>
+<span class="co">#         ) +</span>
+<span class="co">#   guides(color=guide_legend(nrow = 2, byrow = TRUE)) +</span>
+<span class="co">#   coord_equal(clip="off")</span></code></pre></div>
+</div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
 </div>
