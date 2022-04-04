@@ -100,8 +100,7 @@ grafico_radar<- function (plot.data, base.size = 20, webtype = "mini",
                           gridline.min.linetype = "longdash", gridline.mid.linetype = "longdash",
                           gridline.max.linetype = "longdash", gridline.min.colour = "grey",
                           gridline.mid.colour = "#007A87", gridline.max.colour = "grey",
-                          grid.label.size = 6, gridline.label.offset = -0.1 * (grid.max -
-                                                                                 centre.y), label.gridline.min = TRUE, label.gridline.mid = TRUE,
+                          grid.label.size = 6, gridline.label.offset = -0.1 * (grid.max - centre.y), label.gridline.min = TRUE, label.gridline.mid = TRUE,
                           label.gridline.max = TRUE, gridline.label = NULL, axis.label.offset = 1.15,
                           axis.label.size = 5, axis.line.colour = "grey", group.line.width = 1.5,
                           group.point.size = 3, group.colours = NULL, group.fill.colours = NULL,
@@ -111,6 +110,39 @@ grafico_radar<- function (plot.data, base.size = 20, webtype = "mini",
                           polygonfill.transparency = 0.2, multiplots = FALSE, stripbackground = TRUE,
                           fullscore = NULL)
 {
+  
+  #armando plot.data, cambiar plot.data por data,... en los parametros y retomar esto.
+  # plot.data<-
+  # data %>% 
+  # select(...) %>% 
+  # sjlabelled::label_to_colnames() %>%
+  # pivot_longer(everything(), names_to = "pregunta", values_to = "numero") %>%
+  # mutate(nombres=sjlabelled::as_label(numero)) %>% 
+  # group_by(pregunta, numero, nombres) %>%
+  # dplyr::summarize(Freq = n()) %>% 
+  # group_by(pregunta) %>% 
+  # dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),
+  #               numero = as.character(numero),
+  #               nombres = as.character(nombres)) %>% 
+  # separate(pregunta, c("Servicio","group", NA),  sep=" - ") %>% 
+  # filter(nombres!="No") %>%
+  # select(-c(numero, nombres, Freq)) %>%
+  # group_by(group) %>% 
+  # pivot_wider(names_from = Servicio, values_from = prop) %>% 
+  # mutate(
+  #  group=case_when(
+  #   group %in% "Â¿Conoce este servicio de bienestar que brinda la universidad?" ~ "Â¿Lo conoce?",
+  #   TRUE ~ group)
+  # ) %>% 
+  # ungroup()
+  # 
+  # radar.tag<-
+  #   base %>% 
+  #   select(starts_with("q0008_")) %>% 
+  #   nrow()
+  
+  
+  #ggradar3
   plot.extent.x.sf = 1
   plot.extent.y.sf = 1.2
   x.centre.range = 0.02 * (grid.max - centre.y)

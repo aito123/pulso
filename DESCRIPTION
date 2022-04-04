@@ -6,8 +6,6 @@ Authors@R:
            comment = c(ORCID = "0000-0002-9739-9964"))
 Description: Conjunto de funciones para los informes de Pulso PUCP.
 License: MIT + file LICENSE
-Depends: 
-    R (>= 2.10)
 Imports: 
     cowplot,
     DT,
@@ -45,6 +43,5 @@ VignetteBuilder:
     knitr
 Encoding: UTF-8
 Language: es
-LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
