@@ -29,6 +29,8 @@ Imports:
     officedown,
     officer,
     paletteer,
+    pkgdown,
+    pkgload,
     plotly,
     RColorBrewer,
     rio,

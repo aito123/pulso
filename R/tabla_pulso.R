@@ -132,9 +132,10 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
       modify_header(label ~ "") %>%
       bold_labels() %>%
       remove_row_type(variables = everything(),type = c("header")) %>% 
+      modify_footnote(update = everything() ~ NA) %>% 
       as_flex_table() %>%
       add_header_lines(titulo) %>%
-      add_footer_lines("Fuente: Pulso PUCP") %>%
+      add_footer_lines("% (n) \nFuente: Pulso PUCP") %>%
       italic(italic = TRUE, part = "header") %>% 
       set_table_properties(layout = "autofit") %>%
       fontsize(size = 9, part = "all") %>% 
@@ -160,7 +161,8 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
             digits = list(dplyr::everything() ~ c(2, 0)),
             missing_text = "No sabe / No responde",
             label = everything() ~ "") %>%
-        remove_row_type(variables = everything(),type = c("header"))
+        remove_row_type(variables = everything(),type = c("header")) %>% 
+          modify_footnote(update = everything() ~ NA)
 
       }
 
@@ -185,7 +187,8 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
                                label = everything() ~ "") %>%
         gtsummary::modify_header(label ~ "") %>%
         gtsummary::bold_labels() %>%
-        remove_row_type(variables = everything(),type = c("header"))
+        remove_row_type(variables = everything(),type = c("header")) %>% 
+        modify_footnote(update = everything() ~ NA)
 
       #tbl sub_var1
       sub_tables <- purrr::map(sub_var1, ~fn_subtable(data = data, main = main_var, sub = .x))
@@ -202,7 +205,7 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
         bold_labels() %>%
         as_flex_table() %>%
         add_header_lines(titulo) %>%
-        add_footer_lines("Fuente: Pulso PUCP") %>%
+        add_footer_lines("% (n) \nFuente: Pulso PUCP") %>%
         italic(italic = TRUE, part = "header") %>% 
         set_table_properties(layout = "autofit") %>%
         fontsize(size = 9, part = "all") %>% 
@@ -223,7 +226,7 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
             digits = list(dplyr::everything() ~ c(2, 0)),
             missing = "no",
             label = everything() ~ "") %>%
-          modify_footnote(all_stat_cols() ~ "% (n)") %>%
+          modify_footnote(update = everything() ~ NA) %>%
           remove_row_type(-1) %>%
           modify_header(label ~ "") %>%
           bold_labels() %>%
@@ -253,7 +256,7 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
                 digits = list(dplyr::everything() ~ c(2, 0)),
                 missing = "no",
                 label = everything() ~ "") %>%
-              modify_footnote(all_stat_cols() ~ "% (n)") %>%
+              modify_footnote(update = everything() ~ NA) %>%
               remove_row_type(-1) %>%
               modify_header(label ~ "") %>%
               bold_labels() %>%
@@ -275,7 +278,7 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
               digits = list(dplyr::everything() ~ c(2, 0)),
               missing = "no",
               label = everything() ~ "") %>%
-            modify_footnote(all_stat_cols() ~ "% (n)") %>%
+            modify_footnote(update = everything() ~ NA) %>%
             remove_row_type(-1) %>%
             modify_header(label ~ "") %>%
             bold_labels() %>%
@@ -296,7 +299,7 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
             bold_labels() %>% 
             as_flex_table() %>%
             add_header_lines(titulo) %>%
-            add_footer_lines("Fuente: Pulso PUCP") %>%
+            add_footer_lines("% (n) \nFuente: Pulso PUCP") %>%
             italic(italic = TRUE, part = "header") %>% 
             set_table_properties(layout = "autofit") %>%
             fontsize(size = 9, part = "all") %>% 

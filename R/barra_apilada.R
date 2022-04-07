@@ -5,6 +5,9 @@
 #' 
 #' @param data Base de datos para la funcion
 #' @param var Variable para el grafico de barra apilada
+#' @import pkgload
+#' @import pkgdown
+#' @import testthat
 #' @import glue
 #' @import sjlabelled
 #' @import testthat
