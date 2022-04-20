@@ -4,7 +4,13 @@
 \alias{tabla_pulso}
 \title{Funcion para realizar tablas de cruces}
 \usage{
-tabla_pulso(data, main_var = NULL, sub_var = NULL, titulo = titulo1)
+tabla_pulso(
+  data,
+  main_var = NULL,
+  sub_var = NULL,
+  filtrar = TRUE,
+  titulo = titulo1
+)
 }
 \arguments{
 \item{data}{Base de datos para la funcion}

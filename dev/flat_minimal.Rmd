@@ -872,223 +872,6 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
 
 ```
 
-# Barra apilada n (se descontinuara)
-
-```{r function-barra_apilada_n}
-
-#' Funcion para realizar un grafico de barra apilada de n variables.
-#' 
-#' @param data Base de datos para la funcion
-#' @param ... Variables para el grafico de barra apilada
-#' @import tidyverse
-#' @import glue
-#' @import sjlabelled
-#' @import testthat
-#' @import janitor
-#' @import glue
-#' @import lubridate
-#' @import scales
-#' @import Hmisc
-#' @import lazyeval
-#' @import plotly
-#' @import ggrepel
-#' @import cowplot
-#' @import grid
-#' @import fmsb
-#' @import haven
-#' @import rio
-#' @import officer
-#' @import officedown
-#' @import sjlabelled
-#' @import flextable
-#' @import knitr
-#' @import kableExtra
-#' @import DT
-#' @import gtsummary
-#' @import ggpubr
-#' @import paletteer
-#' @import RColorBrewer
-#' @import grDevices
-#' @import graphics
-#' @import utils
-#' @return Un grafico de barras apiladas
-#' @examples
-#' @export
-
-barra_apilada_n<-function(data, ..., ordenado=TRUE){
-
-  tag<-
-    data %>%
-    select(...) %>%
-    nrow()
-
-  nombres_orden<-
-    data %>%
-    select(...)%>%
-    sjlabelled::label_to_colnames() %>%
-    names()
-
-  nombres_orden<-ordered(factor(nombres_orden))
-
-  noms<-
-    data %>%
-    select(...) %>%
-    names()
-
-  pop<-as.character(noms)
-
-  labels <- tibble(
-    pregunta = sort(rep(as.character(unlist(sjlabelled::get_label(data[, 
-        pop]), use.names = FALSE)), sum(nchar(unique(as.numeric(unlist(sjlabelled::get_values(data[, 
-        pop]), use.names = FALSE))))))), 
-    
-    numero = as.character(unlist(sjlabelled::get_values(data[, 
-        pop]), use.names = FALSE)), 
-    
-    nombres = unlist(sjlabelled::get_labels(data[, 
-        pop]), use.names = FALSE), ) %>% 
-    
-    filter(numero != 0)
-
-  #Tabla
-  tablon<-
-
-    data %>%
-    select(...)%>%
-    sjlabelled::label_to_colnames() %>%
-    pivot_longer(everything(), names_to = "pregunta", values_to = "numero") %>%
-    mutate(nombres=sjlabelled::as_label(numero)) %>%
-    group_by(pregunta, numero, nombres) %>%
-    drop_na(numero) %>%
-    filter(numero!=0) %>%
-    dplyr::summarize(Freq = n()) %>%
-    group_by(pregunta) %>%
-    dplyr::mutate(prop = round_half_up(Freq/sum(Freq), digits = 2),
-                  numero = as.character(numero),
-                  nombres = as.character(nombres)) %>%
-
-    full_join(labels) %>%
-    mutate(across(where(is.numeric), ~replace_na(.,0))) %>%
-
-    ungroup() %>%
-    mutate(
-      color=case_when(
-        numero=="1" ~"#F4B183",
-        numero=="2" ~"#FFD966",
-        numero=="3" ~"#B0D597",
-        numero=="4" ~"#8FC36B",
-        TRUE~"#D3D3D3"
-      )) %>%
-
-    mutate(
-      numero2=case_when(
-        numero %in% "3" ~ "4",
-        TRUE ~ numero),
-
-
-    ) %>%
-    group_by(pregunta, numero2) %>%
-    mutate(prop2=sum(prop)) %>%
-    ungroup()
-
-
-  tablon %>%
-
-    #Gráfico
-    ggplot(aes(x=if(isTRUE(ordenado)){fct_reorder2(pregunta, numero, -prop2)}else{fct_rev(factor(pregunta, levels = nombres_orden))}, y=prop, label = scales::percent(prop, accuracy = 1) )) +
-    geom_col(aes(fill=factor(color, ordered = TRUE, levels = c("#8FC36B","#B0D597","#FFD966","#F4B183","#D3D3D3"))), position = "fill", width = 0.6) +
-
-    #Etiqueta = 4
-    geom_text(aes(y=1.05, label = ifelse((numero == 4 & prop < 0.07) & !(numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060",
-              family="sans") +
-
-    #Etiqueta = 3
-    geom_text(aes(y=1.05, label = ifelse((numero == 3 & prop < 0.07) & !(numero == 3 & prop == 0) & (numero == 4 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060",
-              family="sans") +
-
-    #Etiqueta = 2
-    geom_text(aes(y=-0.05, label = ifelse((numero == 2 & prop < 0.07) & !(numero == 2 & prop == 0) & (numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060",
-              family="sans") +
-
-    #Etiqueta = 1
-    geom_text(aes(y=-0.05, label = ifelse((numero == 1 & prop < 0.07) & !(numero == 1 & prop == 0), scales::percent(prop, accuracy = 1), "") ),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060",
-              family="sans") +
-
-    #Etiqueta = El resto
-    geom_text(aes(label = ifelse(!((numero == 4 & prop < 0.07) |
-                                     (numero == 3 & prop < 0.07) & (numero == 4 & prop == 0) |
-                                     (numero == 2 & prop < 0.07) & (numero == 1 & prop == 0) |
-                                     (numero == 1 & prop < 0.07)) & !(prop == 0), scales::percent(prop, accuracy = 1), "") ),
-              position = position_stack(vjust = 0.5),
-              size = 3.5,
-              fontface = "bold",
-              color = "#002060",
-              family="sans") +
-
-    #TOP2BOX
-    geom_label(aes(y=1.2, label=ifelse(numero2 %in% "4", scales::percent(prop2, accuracy = 1), NA)),
-               size = 3.5,
-               fontface = "bold",
-               color = "#459847",
-               family="sans") +
-    annotate("text", label="TOP2BOX", x=as.numeric(count(as.data.frame(unique(tablon$pregunta)))), y = 1.2, vjust = -3,
-             size = 3.5,
-             fontface = "bold",
-             color = "#459847",
-             family="sans") +
-
-    #eje x y
-    scale_x_discrete(labels = wrap_format(42)) +
-    scale_y_continuous(labels = scales::percent, limits = c(-0.05, 1.3)) +
-    scale_fill_identity(labels=str_wrap(levels(fct_reorder(tablon$nombres, tablon$numero, min)), width = 20), breaks= levels(droplevels(factor(tablon$color, ordered = TRUE, levels = c("#D3D3D3","#F4B183","#FFD966","#B0D597","#8FC36B")))), guide="legend") +
-    coord_flip(clip="off", ylim = c(-0.05, 1.3)) +
-
-    #temas
-    theme_pubr() +
-    labs(caption = "Elaborado por Pulso PUCP",
-         tag=glue("N=", tag)) +
-    theme(legend.title = element_blank(),legend.position = "bottom",legend.text = element_text(size = 7, face = "bold",family="sans"),legend.key.height = unit(.2, "cm"),
-          plot.caption = element_text(face = "italic",family="sans"),plot.margin = unit(c(0,0,1,0),"cm"),plot.tag = element_text(size = 8, color="grey40"),plot.tag.position = "topright",
-          text = element_text(size = 9, color="#002060",family="sans"),
-          axis.title = element_blank(),axis.text = element_text(color="#002060"),axis.text.y = element_text(hjust=0.5),axis.text.x = element_blank(),axis.ticks = element_blank(),axis.line = element_blank() ) +
-    guides(fill = guide_legend(reverse=FALSE,label.position = "bottom"))
-
-}
-
-
-```
-
-```{r examples-barra_apilada_n, eval=FALSE}
-
-# data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
-# data_prueba <- haven::read_sav(data_prueba_ruta)
-# 
-# data_prueba %>% 
-#   barra_apilada_n(starts_with("q0011_"))
-
-```
-
-```{r tests-barra_apilada_n}
-
-# test_that("barra_apilada_1 works", {
-#   expect_error(data_prueba %>% 
-#   barra_apilada_n(starts_with("q0011_")), regexp = NA)
-# })
-
-```
-
 # Grafico donut
 
 ```{r function-grafico_donut}
@@ -1132,15 +915,21 @@ barra_apilada_n<-function(data, ..., ordenado=TRUE){
 #' @examples
 #' @export
 
-grafico_donut<- function(data, var, paleta=1, direction=1) {
-
+grafico_donut<- function(data, var, filtrar=TRUE, paleta=1, direction=1) {
+  
+  total<-
+    data %>% 
+    nrow()
+  
   tag<-
     data %>%
+    filter({{filtrar}}) %>% 
     sjlabelled::as_label() %>%
     select({{var}}) %>%
     nrow()
-
+  
   data %>%
+    filter({{filtrar}}) %>% 
     sjlabelled::as_label() %>%
     group_by({{var}}) %>%
     count() %>%
@@ -1177,9 +966,9 @@ grafico_donut<- function(data, var, paleta=1, direction=1) {
           plot.tag = element_text(size = 8, color="grey40"),
           plot.tag.position = "topright") +
     labs(caption = "Elaborado por Pulso PUCP",
-         tag = glue("N=",tag))
-
-
+         tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} )
+  
+  
 }
 
 
@@ -1378,7 +1167,7 @@ grafico_pie<- function(data, var, filtrar=TRUE, color1="#A9D18E",color2="#FF9393
 #' @examples
 #' @export
 
-grafico_radar2<- function (data, ..., order=everything(), base.size = 20, webtype = "mini",
+grafico_radar<- function (data, ..., order=everything(), base.size = 20, webtype = "mini",
                           axis.labels = "", grid.min = 0, grid.max = 1, centre.y = grid.min -
                             ((1/9) * (grid.max - grid.min)), label.centre.y = FALSE,
                           grid.line.width = 0.5, grid.line.trend = "classic",
@@ -2057,35 +1846,48 @@ radar.tag<-
 #' @examples
 #' @export
 
-tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
-
+tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, filtrar=TRUE, titulo=titulo1){
+  
   #switch
   #switch_main_var
   switch_sub_var <- tidyselect::eval_select(enquo(sub_var), data[unique(names(data))])
   switch_sub_var <- names(switch_sub_var)
   switch_sub_var <- switch_sub_var  %>% table() %>% sum() %>% as.numeric()
-
+  
   #switch_main_var
   switch_main_var <- tidyselect::eval_select(enquo(main_var), data[unique(names(data))])
   switch_main_var <- names(switch_main_var)
   switch_main_var <- switch_main_var  %>% table() %>% sum() %>% as.numeric()
-
+  
   #titulo de la tabla
   titulo1<-
     data %>%
     select({{main_var}}) %>%
     get_label() %>%
     unique()
-
+  
+  #labels
+  pop<-
+    data %>% 
+    select({{main_var}}) %>% 
+    names()
+  
+  labels<-
+    tibble(
+      numero=as.character(unlist(sjlabelled::get_values(data[,pop]), use.names = FALSE)),
+      nombres=unlist(sjlabelled::get_labels(data[,pop]), use.names = FALSE),
+    )
+  
   #1. opción múltiple sin cruce
   if (switch_main_var == 1 & switch_sub_var == 0){
-
+    
     t0<-data %>%
+      filter({{filtrar}}) %>% 
       select({{main_var}}) %>%
       drop_na() %>% #se van los filtrados
       mutate(across(everything(), ~replace(., .==0, NA))) %>% #SIN INF pasa a ser los nuevos NA
       haven::as_factor() %>%
-      mutate(across(everything(), ~forcats::fct_drop(., "SIN INF"))) %>% #dropear categoria SIN INF de factor
+      mutate(across(everything(), ~forcats::fct_drop(., labels[labels$numero==0, ]$nombres))) %>% #dropear categoria SIN INF de factor
       gtsummary::tbl_summary(statistic = all_categorical()~ "{p}% ({n})",
                              digits = list(everything() ~ c(2, 0)),
                              missing_text = "No sabe / No responde",
@@ -2103,45 +1905,47 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
       height(height = 0.75, part = "body")
     
     t0
-
+    
   }else
-
+    
     #2. opción múltiple con cruce
     if (switch_main_var == 1 & switch_sub_var > 0){
-
+      
       fn_subtable <- function(data, main, sub){
         data %>%
+          filter({{filtrar}}) %>% 
           dplyr::select({{main}},{{sub}}) %>%
           drop_na() %>% #se van los filtrados
           mutate(across(everything(), ~replace(., .==0, NA))) %>% #SIN INF pasa a ser los nuevos NA
           haven::as_factor() %>%
-          mutate(across(everything(), ~forcats::fct_drop(., "SIN INF"))) %>% #dropear categoria SIN INF de factor
+          mutate(across(everything(), ~forcats::fct_drop(., labels[labels$numero==0, ]$nombres))) %>% #dropear categoria SIN INF de factor
           gtsummary::tbl_summary(
             by = {{sub}},
             statistic = gtsummary::all_categorical()~ "{p}% ({n})",
             digits = list(dplyr::everything() ~ c(2, 0)),
             missing_text = "No sabe / No responde",
             label = everything() ~ "") %>%
-        remove_row_type(variables = everything(),type = c("header")) %>% 
+          remove_row_type(variables = everything(),type = c("header")) %>% 
           modify_footnote(update = everything() ~ NA)
-
+        
       }
-
+      
       #main var
       main_var <- rlang::enexpr(main_var)# 1. Capture `list(...)` call as expression
-
+      
       #subvar
       sub_var <- tidyselect::eval_select(enquo(sub_var), data[unique(names(data))])
       sub_var <- names(sub_var)
       sub_var1 <- rlang::syms(sub_var)
-
+      
       #tbl main var
       t0 <- data %>%
+        filter({{filtrar}}) %>% 
         dplyr::select({{main_var}}) %>%
         drop_na() %>% #se van los filtrados
         mutate(across(everything(), ~replace(., .==0, NA))) %>% #SIN INF pasa a ser los nuevos NA
         haven::as_factor() %>%
-        mutate(across(everything(), ~forcats::fct_drop(., "SIN INF"))) %>% #dropear categoria SIN INF de factor
+        mutate(across(everything(), ~forcats::fct_drop(., labels[labels$numero==0, ]$nombres))) %>% #dropear categoria SIN INF de factor
         gtsummary::tbl_summary(statistic = gtsummary::all_categorical() ~ "{p}% ({n})",
                                digits = list(dplyr::everything() ~ c(2, 0)),
                                missing_text = "No sabe / No responde",
@@ -2150,16 +1954,16 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
         gtsummary::bold_labels() %>%
         remove_row_type(variables = everything(),type = c("header")) %>% 
         modify_footnote(update = everything() ~ NA)
-
+      
       #tbl sub_var1
       sub_tables <- purrr::map(sub_var1, ~fn_subtable(data = data, main = main_var, sub = .x))
-
+      
       #titulos variables cruce
       sub_var_labels<-
         data %>%
         select(sub_var) %>%
         get_label()
-
+      
       #merge
       tbls <-  c(list(t0), sub_tables) %>%
         gtsummary::tbl_merge(tab_spanner = c("**Total**", paste0("**",sub_var_labels,"**"))) %>%
@@ -2171,15 +1975,16 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
         set_table_properties(layout = "autofit") %>%
         fontsize(size = 9, part = "all") %>% 
         height(height = 0.75, part = "body")
-    
+      
       tbls
-
+      
     }else
-
+      
       #3. respuesta múltiple sin cruce
       if (switch_main_var > 1 & switch_sub_var == 0){
-
+        
         tbl<-data %>%
+          filter({{filtrar}}) %>% 
           select({{main_var}}) %>%
           sjlabelled::as_label() %>%
           gtsummary::tbl_summary(
@@ -2199,16 +2004,17 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
           set_table_properties(layout = "autofit") %>%
           fontsize(size = 9, part = "all") %>% 
           height(height = 0.75, part = "body")
-    
+        
         tbl
-
+        
       }else
-
+        
         #4. respuesta múltiple con cruce
         if(switch_main_var > 1 & switch_sub_var > 0){
-
+          
           fn_subtable <- function(data, main, sub){
             data %>%
+              filter({{filtrar}}) %>% 
               dplyr::select({{main}},{{sub}}) %>%
               sjlabelled::as_label() %>%
               gtsummary::tbl_summary(
@@ -2221,17 +2027,18 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
               remove_row_type(-1) %>%
               modify_header(label ~ "") %>%
               bold_labels() %>%
-            remove_row_type(variables = everything(),type = c("header"))
-
+              remove_row_type(variables = everything(),type = c("header"))
+            
           }
-
+          
           #subvar
           sub_var <- tidyselect::eval_select(enquo(sub_var), data[unique(names(data))])
           sub_var <- names(sub_var)
           sub_var1 <- rlang::syms(sub_var)
-
+          
           #tbl main var
           t0 <-data %>%
+            filter({{filtrar}}) %>% 
             select({{main_var}}) %>%
             sjlabelled::as_label() %>%
             gtsummary::tbl_summary(
@@ -2243,17 +2050,17 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
             remove_row_type(-1) %>%
             modify_header(label ~ "") %>%
             bold_labels() %>%
-          remove_row_type(variables = everything(),type = c("header"))
-
+            remove_row_type(variables = everything(),type = c("header"))
+          
           #tbl sub_var1
           sub_tables <- purrr::map(sub_var1, ~fn_subtable(data = data, main = main_var, sub = .x))
-
+          
           #titulos variables cruce
           sub_var_labels<-
             data %>%
             select(sub_var) %>%
             get_label()
-
+          
           #merge
           tbls <-  c(list(t0), sub_tables) %>%
             gtsummary::tbl_merge(tab_spanner = c("**Total**", paste0("**",sub_var_labels,"**"))) %>%
@@ -2265,14 +2072,14 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
             set_table_properties(layout = "autofit") %>%
             fontsize(size = 9, part = "all") %>% 
             height(height = 0.75, part = "body")
-    
+          
           tbls
-
-
+          
+          
         }else
-
-          {return("Error. Necesitas proporcionar al menos una variable.")}
-
+          
+        {return("Error. Necesitas proporcionar al menos una variable.")}
+  
 }
 
 

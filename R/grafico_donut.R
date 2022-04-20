@@ -47,15 +47,21 @@
 #' 
 #' @export
 
-grafico_donut<- function(data, var, paleta=1, direction=1) {
-
+grafico_donut<- function(data, var, filtrar=TRUE, paleta=1, direction=1) {
+  
+  total<-
+    data %>% 
+    nrow()
+  
   tag<-
     data %>%
+    filter({{filtrar}}) %>% 
     sjlabelled::as_label() %>%
     select({{var}}) %>%
     nrow()
-
+  
   data %>%
+    filter({{filtrar}}) %>% 
     sjlabelled::as_label() %>%
     group_by({{var}}) %>%
     count() %>%
@@ -92,9 +98,9 @@ grafico_donut<- function(data, var, paleta=1, direction=1) {
           plot.tag = element_text(size = 8, color="grey40"),
           plot.tag.position = "topright") +
     labs(caption = "Elaborado por Pulso PUCP",
-         tag = glue("N=",tag))
-
-
+         tag = if(tag == total) {glue("N=",tag)} else {glue("N=",tag,"/",total)} )
+  
+  
 }
 
 

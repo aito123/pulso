@@ -4,7 +4,7 @@
 \alias{grafico_donut}
 \title{Funcion para realizar un grafico donut.}
 \usage{
-grafico_donut(data, var, paleta = 1, direction = 1)
+grafico_donut(data, var, filtrar = TRUE, paleta = 1, direction = 1)
 }
 \arguments{
 \item{data}{Base de datos para la funcion}

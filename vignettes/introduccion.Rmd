@@ -65,18 +65,6 @@ Este paquete fue creado por Santiago Sotelo.
 
 ```
 
-# Barra apilada n (se descontinuara)
-
-```{r examples-barra_apilada_n, eval = FALSE}
-
-# data_prueba_ruta <- system.file("data_prueba.sav", package = "pulso")
-# data_prueba <- haven::read_sav(data_prueba_ruta)
-# 
-# data_prueba %>% 
-#   barra_apilada_n(starts_with("q0011_"))
-
-```
-
 # Grafico donut
 
 ```{r examples-grafico_donut, eval = FALSE}

@@ -96,35 +96,48 @@
 #' 
 #' @export
 
-tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
-
+tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, filtrar=TRUE, titulo=titulo1){
+  
   #switch
   #switch_main_var
   switch_sub_var <- tidyselect::eval_select(enquo(sub_var), data[unique(names(data))])
   switch_sub_var <- names(switch_sub_var)
   switch_sub_var <- switch_sub_var  %>% table() %>% sum() %>% as.numeric()
-
+  
   #switch_main_var
   switch_main_var <- tidyselect::eval_select(enquo(main_var), data[unique(names(data))])
   switch_main_var <- names(switch_main_var)
   switch_main_var <- switch_main_var  %>% table() %>% sum() %>% as.numeric()
-
+  
   #titulo de la tabla
   titulo1<-
     data %>%
     select({{main_var}}) %>%
     get_label() %>%
     unique()
-
+  
+  #labels
+  pop<-
+    data %>% 
+    select({{main_var}}) %>% 
+    names()
+  
+  labels<-
+    tibble(
+      numero=as.character(unlist(sjlabelled::get_values(data[,pop]), use.names = FALSE)),
+      nombres=unlist(sjlabelled::get_labels(data[,pop]), use.names = FALSE),
+    )
+  
   #1. opciÃ³n mÃºltiple sin cruce
   if (switch_main_var == 1 & switch_sub_var == 0){
-
+    
     t0<-data %>%
+      filter({{filtrar}}) %>% 
       select({{main_var}}) %>%
       drop_na() %>% #se van los filtrados
       mutate(across(everything(), ~replace(., .==0, NA))) %>% #SIN INF pasa a ser los nuevos NA
       haven::as_factor() %>%
-      mutate(across(everything(), ~forcats::fct_drop(., "SIN INF"))) %>% #dropear categoria SIN INF de factor
+      mutate(across(everything(), ~forcats::fct_drop(., labels[labels$numero==0, ]$nombres))) %>% #dropear categoria SIN INF de factor
       gtsummary::tbl_summary(statistic = all_categorical()~ "{p}% ({n})",
                              digits = list(everything() ~ c(2, 0)),
                              missing_text = "No sabe / No responde",
@@ -142,45 +155,47 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
       height(height = 0.75, part = "body")
     
     t0
-
+    
   }else
-
+    
     #2. opciÃ³n mÃºltiple con cruce
     if (switch_main_var == 1 & switch_sub_var > 0){
-
+      
       fn_subtable <- function(data, main, sub){
         data %>%
+          filter({{filtrar}}) %>% 
           dplyr::select({{main}},{{sub}}) %>%
           drop_na() %>% #se van los filtrados
           mutate(across(everything(), ~replace(., .==0, NA))) %>% #SIN INF pasa a ser los nuevos NA
           haven::as_factor() %>%
-          mutate(across(everything(), ~forcats::fct_drop(., "SIN INF"))) %>% #dropear categoria SIN INF de factor
+          mutate(across(everything(), ~forcats::fct_drop(., labels[labels$numero==0, ]$nombres))) %>% #dropear categoria SIN INF de factor
           gtsummary::tbl_summary(
             by = {{sub}},
             statistic = gtsummary::all_categorical()~ "{p}% ({n})",
             digits = list(dplyr::everything() ~ c(2, 0)),
             missing_text = "No sabe / No responde",
             label = everything() ~ "") %>%
-        remove_row_type(variables = everything(),type = c("header")) %>% 
+          remove_row_type(variables = everything(),type = c("header")) %>% 
           modify_footnote(update = everything() ~ NA)
-
+        
       }
-
+      
       #main var
       main_var <- rlang::enexpr(main_var)# 1. Capture `list(...)` call as expression
-
+      
       #subvar
       sub_var <- tidyselect::eval_select(enquo(sub_var), data[unique(names(data))])
       sub_var <- names(sub_var)
       sub_var1 <- rlang::syms(sub_var)
-
+      
       #tbl main var
       t0 <- data %>%
+        filter({{filtrar}}) %>% 
         dplyr::select({{main_var}}) %>%
         drop_na() %>% #se van los filtrados
         mutate(across(everything(), ~replace(., .==0, NA))) %>% #SIN INF pasa a ser los nuevos NA
         haven::as_factor() %>%
-        mutate(across(everything(), ~forcats::fct_drop(., "SIN INF"))) %>% #dropear categoria SIN INF de factor
+        mutate(across(everything(), ~forcats::fct_drop(., labels[labels$numero==0, ]$nombres))) %>% #dropear categoria SIN INF de factor
         gtsummary::tbl_summary(statistic = gtsummary::all_categorical() ~ "{p}% ({n})",
                                digits = list(dplyr::everything() ~ c(2, 0)),
                                missing_text = "No sabe / No responde",
@@ -189,16 +204,16 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
         gtsummary::bold_labels() %>%
         remove_row_type(variables = everything(),type = c("header")) %>% 
         modify_footnote(update = everything() ~ NA)
-
+      
       #tbl sub_var1
       sub_tables <- purrr::map(sub_var1, ~fn_subtable(data = data, main = main_var, sub = .x))
-
+      
       #titulos variables cruce
       sub_var_labels<-
         data %>%
         select(sub_var) %>%
         get_label()
-
+      
       #merge
       tbls <-  c(list(t0), sub_tables) %>%
         gtsummary::tbl_merge(tab_spanner = c("**Total**", paste0("**",sub_var_labels,"**"))) %>%
@@ -210,15 +225,16 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
         set_table_properties(layout = "autofit") %>%
         fontsize(size = 9, part = "all") %>% 
         height(height = 0.75, part = "body")
-    
+      
       tbls
-
+      
     }else
-
+      
       #3. respuesta mÃºltiple sin cruce
       if (switch_main_var > 1 & switch_sub_var == 0){
-
+        
         tbl<-data %>%
+          filter({{filtrar}}) %>% 
           select({{main_var}}) %>%
           sjlabelled::as_label() %>%
           gtsummary::tbl_summary(
@@ -238,16 +254,17 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
           set_table_properties(layout = "autofit") %>%
           fontsize(size = 9, part = "all") %>% 
           height(height = 0.75, part = "body")
-    
+        
         tbl
-
+        
       }else
-
+        
         #4. respuesta mÃºltiple con cruce
         if(switch_main_var > 1 & switch_sub_var > 0){
-
+          
           fn_subtable <- function(data, main, sub){
             data %>%
+              filter({{filtrar}}) %>% 
               dplyr::select({{main}},{{sub}}) %>%
               sjlabelled::as_label() %>%
               gtsummary::tbl_summary(
@@ -260,17 +277,18 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
               remove_row_type(-1) %>%
               modify_header(label ~ "") %>%
               bold_labels() %>%
-            remove_row_type(variables = everything(),type = c("header"))
-
+              remove_row_type(variables = everything(),type = c("header"))
+            
           }
-
+          
           #subvar
           sub_var <- tidyselect::eval_select(enquo(sub_var), data[unique(names(data))])
           sub_var <- names(sub_var)
           sub_var1 <- rlang::syms(sub_var)
-
+          
           #tbl main var
           t0 <-data %>%
+            filter({{filtrar}}) %>% 
             select({{main_var}}) %>%
             sjlabelled::as_label() %>%
             gtsummary::tbl_summary(
@@ -282,17 +300,17 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
             remove_row_type(-1) %>%
             modify_header(label ~ "") %>%
             bold_labels() %>%
-          remove_row_type(variables = everything(),type = c("header"))
-
+            remove_row_type(variables = everything(),type = c("header"))
+          
           #tbl sub_var1
           sub_tables <- purrr::map(sub_var1, ~fn_subtable(data = data, main = main_var, sub = .x))
-
+          
           #titulos variables cruce
           sub_var_labels<-
             data %>%
             select(sub_var) %>%
             get_label()
-
+          
           #merge
           tbls <-  c(list(t0), sub_tables) %>%
             gtsummary::tbl_merge(tab_spanner = c("**Total**", paste0("**",sub_var_labels,"**"))) %>%
@@ -304,14 +322,14 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, titulo=titulo1){
             set_table_properties(layout = "autofit") %>%
             fontsize(size = 9, part = "all") %>% 
             height(height = 0.75, part = "body")
-    
+          
           tbls
-
-
+          
+          
         }else
-
-          {return("Error. Necesitas proporcionar al menos una variable.")}
-
+          
+        {return("Error. Necesitas proporcionar al menos una variable.")}
+  
 }
 
 

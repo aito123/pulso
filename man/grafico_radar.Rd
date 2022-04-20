@@ -5,7 +5,9 @@
 \title{Funcion para realizar un grafico radar}
 \usage{
 grafico_radar(
-  plot.data,
+  data,
+  ...,
+  order = everything(),
   base.size = 20,
   webtype = "mini",
   axis.labels = "",
@@ -21,16 +23,16 @@ grafico_radar(
   gridline.min.colour = "grey",
   gridline.mid.colour = "#007A87",
   gridline.max.colour = "grey",
-  grid.label.size = 6,
+  grid.label.size = 3,
   gridline.label.offset = -0.1 * (grid.max - centre.y),
   label.gridline.min = TRUE,
   label.gridline.mid = TRUE,
   label.gridline.max = TRUE,
   gridline.label = NULL,
   axis.label.offset = 1.15,
-  axis.label.size = 5,
+  axis.label.size = 3,
   axis.line.colour = "grey",
-  group.line.width = 1.5,
+  group.line.width = 1,
   group.point.size = 3,
   group.colours = NULL,
   group.fill.colours = NULL,
@@ -41,11 +43,11 @@ grafico_radar(
   plot.title = "",
   legend.text.size = 14,
   radarshape = "round",
-  polygonfill = TRUE,
+  polygonfill = FALSE,
   polygonfill.transparency = 0.2,
   multiplots = FALSE,
   stripbackground = TRUE,
-  fullscore = NULL
+  fullscore = fullscore
 )
 }
 \arguments{
