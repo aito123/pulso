@@ -124,8 +124,8 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, filtrar=TRUE, titulo=ti
   
   labels<-
     tibble(
-      numero=ifelse(is_empty(as.character(unlist(sjlabelled::get_values(data[,pop]), use.names = FALSE))), NA, as.character(unlist(sjlabelled::get_values(data[,pop]), use.names = FALSE)) ),
-      nombres=unlist(sjlabelled::get_labels(data[,pop]), use.names = FALSE),
+      numero=if(is.numeric(unlist(sjlabelled::get_values(data[,pop]), use.names = FALSE)) ){as.character(unlist(sjlabelled::get_values(base[,pop]), use.names = FALSE))} else {NA},
+      nombres=unlist(sjlabelled::get_labels(base[pop]), use.names = FALSE),
     )
   
   #1. opciÃ³n mÃºltiple sin cruce
