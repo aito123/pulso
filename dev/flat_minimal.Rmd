@@ -2081,7 +2081,7 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, filtrar=TRUE, titulo=ti
         {return("Error. Necesitas proporcionar al menos una variable.")}
   
 }
-
+#
 
 ```
 
