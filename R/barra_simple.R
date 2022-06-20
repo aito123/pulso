@@ -5,14 +5,14 @@
 #' 
 #' @param data Base de datos para la funcion
 #' @param var Variable para el grafico de barras simple
-#' @param filtrar Por default TRUE que significa ningÃºn filtro, si se quiere filtrar por una variable especificar la variable y el valor a filtrar (ej: filtrar = q0002 == 1 que significa filtrar la base para que aparezcan solo los casos que tienen en la pregunta q0002 el valor de 1).
+#' @param filtrar Por default TRUE que significa ningún filtro, si se quiere filtrar por una variable especificar la variable y el valor a filtrar (ej: filtrar = q0002 == 1 que significa filtrar la base para que aparezcan solo los casos que tienen en la pregunta q0002 el valor de 1).
 #' @param ordenado Por default es TRUE, significa que ordena las barras de menor a mayor, cambiar a FALSE para dejarlas en el orden original.
 #' @param frecuencia Por default es FALSE, cambiar a TRUE para visualizar los resultados en frecuencias y no en porcentajes.
 #' @param porcentaje Por default es TRUE, cambiar a FALSE para visualizar los resultados de porcentajes sin el simbolo %.
 #' @param ultimo Por default es NULL, escribir entre comillas la palabra que quieres que vaya al final de las barras (ej: ultimo="Otros")
-#' @param max.limit Por default es 1, es el limite mÃ¡ximo del eje x. 1=100 cuando son resultados en porcentajes (ej: max.limit=0.75 significa maximo 75%). Aunque el porcentaje estÃ© en FALSE, el max.limit debe ser tratado como si 1.00 fuera el maximo y no como si 100 fuera el maximo.
-#' @param color Por default es color azul que es "#B0D597" en notacion hexagesimal. Buscar colores hex para mÃ¡s informaciÃ³n. TambiÃ©n permite colores grabados en R como "red".
-#' @param ext.label Por default es 30, a menor el nÃºmero menor espacio para el texto de las etiquetas.
+#' @param max.limit Por default es 1, es el limite máximo del eje x. 1=100 cuando son resultados en porcentajes (ej: max.limit=0.75 significa maximo 75%). Aunque el porcentaje esté en FALSE, el max.limit debe ser tratado como si 1.00 fuera el maximo y no como si 100 fuera el maximo.
+#' @param color Por default es color azul que es "#B0D597" en notacion hexagesimal. Buscar colores hex para más información. También permite colores grabados en R como "red".
+#' @param ext.label Por default es 30, a menor el número menor espacio para el texto de las etiquetas.
 #' @import tidyverse
 #' @import glue
 #' @import sjlabelled

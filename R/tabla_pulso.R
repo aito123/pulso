@@ -128,7 +128,7 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, filtrar=TRUE, titulo=ti
       nombres=unlist(sjlabelled::get_labels(data[pop]), use.names = FALSE),
     )
   
-  #1. opciÃ³n mÃºltiple sin cruce
+  #1. opción múltiple sin cruce
   if (switch_main_var == 1 & switch_sub_var == 0){
     
     t0<-data %>%
@@ -158,7 +158,7 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, filtrar=TRUE, titulo=ti
     
   }else
     
-    #2. opciÃ³n mÃºltiple con cruce
+    #2. opción múltiple con cruce
     if (switch_main_var == 1 & switch_sub_var > 0){
       
       fn_subtable <- function(data, main, sub){
@@ -230,7 +230,7 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, filtrar=TRUE, titulo=ti
       
     }else
       
-      #3. respuesta mÃºltiple sin cruce
+      #3. respuesta múltiple sin cruce
       if (switch_main_var > 1 & switch_sub_var == 0){
         
         tbl<-data %>%
@@ -259,7 +259,7 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, filtrar=TRUE, titulo=ti
         
       }else
         
-        #4. respuesta mÃºltiple con cruce
+        #4. respuesta múltiple con cruce
         if(switch_main_var > 1 & switch_sub_var > 0){
           
           fn_subtable <- function(data, main, sub){
@@ -331,5 +331,5 @@ tabla_pulso<-function(data, main_var=NULL, sub_var=NULL, filtrar=TRUE, titulo=ti
         {return("Error. Necesitas proporcionar al menos una variable.")}
   
 }
-
+#
 

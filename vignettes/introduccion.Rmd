@@ -1,8 +1,9 @@
 ---
 title: "Introduccion"
 output: rmarkdown::html_vignette
+vignette: "%\VignetteEncoding{UTF-8}"
 vignette: >
-  %\VignetteIndexEntry{Introduccion}
+  %\VignetteIndexEntry{introduccion}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

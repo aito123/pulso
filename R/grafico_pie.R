@@ -4,7 +4,7 @@
 #' Funcion para realizar un grafico pie
 #' 
 #' @param data Base de datos para la funcion
-#' @param var Variable para grÃ¡fico pie
+#' @param var Variable para gráfico pie
 #' @import tidyverse
 #' @import glue
 #' @import sjlabelled

@@ -39,6 +39,8 @@
 #' @import grDevices
 #' @import graphics
 #' @import utils
+#' @import ggpubr
+#' @import scales
 #' @return Un grafico de barra apilado
 #' @examples
 #' 
@@ -68,13 +70,13 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
     
     total<-
       data %>%
-      filter({{filtrar}}) %>% # filtro y lÃ³gica
+      filter({{filtrar}}) %>% # filtro y lógica
       select(...) %>%
       nrow() 
     
     tag<-
       data %>%
-      filter({{filtrar}}) %>% # filtro y lÃ³gica
+      filter({{filtrar}}) %>% # filtro y lógica
       select(...) %>%
       filter_all(all_vars(. != 0)) %>% #SIN INF
       nrow() 
@@ -112,7 +114,7 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
                     nombres = as.character(nombres)) %>%
       
       full_join(labels) %>%
-      mutate(across(where(is.numeric), ~replace_na(.,0))) %>%
+      mutate(across(where(is.numeric), ~replace(., is.na(.), 0))) %>%
       
       mutate(
         
@@ -134,7 +136,7 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
     
     tablon %>%
       
-      #GrÃ¡fico
+      #Gráfico
       ggplot(aes(total, prop, label = if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)}else{scales::number(prop, scale = 100, accuracy = 1)} )) +
       geom_col(aes(fill=factor(color, ordered = TRUE, levels = rev(colores(num_colores)) )), position = "fill", width = 0.4) +
       
@@ -196,7 +198,7 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
       coord_flip(clip="off", ylim = c(-0.05, 1.5)) +
       
       #temas
-      theme_pubr() +
+      ggpubr::theme_pubr() +
       labs(subtitle = if(isTRUE(porcentaje)){waiver()} else {"Resultados en porcentajes"},
            caption = "Elaborado por Pulso PUCP") +
       
@@ -228,7 +230,7 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
     
     total<-
       data %>%
-      filter({{filtrar}}) %>% # filtro y lÃ³gica
+      filter({{filtrar}}) %>% # filtro y lógica
       select(...) %>%
       nrow() 
     
@@ -299,7 +301,7 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
                     nombres = as.character(nombres)) %>%
       
       full_join(labels) %>%
-      mutate(across(where(is.numeric), ~replace_na(.,0))) %>%
+      mutate(across(where(is.numeric), ~replace(., is.na(.), 0))) %>%
       
       mutate(
         
@@ -318,7 +320,7 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
       mutate(prop2=sum(prop)) %>%
       ungroup() %>% 
       full_join(tablon_sininf) %>%
-      mutate(across(where(is.numeric), ~replace_na(.,0))) %>% 
+      mutate(across(where(is.numeric), ~replace(., is.na(.), 0))) %>% 
       mutate(base_total=case_when(
         sin_inf == 0 ~ glue("N={total}"),
         sin_inf != 0 ~ glue("N={total-sin_inf}/{total}"),
@@ -328,7 +330,7 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
     
     tablon %>%
       
-      #GrÃ¡fico
+      #Gráfico
       ggplot(aes(x=if(isTRUE(ordenado)){fct_reorder2(pregunta, numero, -prop2)}else{fct_rev(factor(pregunta, levels = nombres_orden))}, y=prop, label = if(isTRUE(porcentaje)){scales::percent(prop, accuracy = 1)}else{scales::number(prop, scale = 100, accuracy = 1)} )) +
       geom_col(aes(fill=factor(color, ordered = TRUE, levels = rev(colores(num_colores)) )), position = "fill", width = 0.6) +
       
@@ -392,13 +394,13 @@ barra_apilada<-function(data, ..., filtrar=TRUE, ordenado=TRUE, porcentaje=TRUE,
                 family="sans") +
       
       #eje x y
-      scale_x_discrete(labels = wrap_format(ext.label)) +
+      scale_x_discrete(labels = scales::wrap_format(ext.label)) +
       scale_y_continuous(labels = if(isTRUE(porcentaje)) {~scales::percent(.x, accuracy = 1)} else {~scales::number(.x, scale = 100, accuracy = 1)}, limits = c(-0.05, 1.3)) +
-      scale_fill_identity(labels=str_wrap(levels(fct_reorder(tablon$nombres, tablon$numero, min)), width = 20), breaks= levels(droplevels(factor(tablon$color, ordered = TRUE, levels = c("#D3D3D3","#F4B183","#FFD966","#B0D597","#8FC36B")))), guide="legend") +
+      scale_fill_identity(labels=str_wrap(levels(fct_reorder(tablon$nombres, tablon$numero, min)), width = 20), breaks= levels(droplevels(factor(tablon$color, ordered = TRUE, levels = colores(num_colores)))), guide="legend") +
       coord_flip(clip="off", ylim = c(-0.05, 1.3)) +
       
       #temas
-      theme_pubr() +
+      ggpubr::theme_pubr() +
       labs(subtitle = if(isTRUE(porcentaje)){waiver()} else {"Resultados en porcentajes"},
            caption = "Elaborado por Pulso PUCP" ) +
       

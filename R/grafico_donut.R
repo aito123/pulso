@@ -4,7 +4,7 @@
 #' Funcion para realizar un grafico donut.
 #' 
 #' @param data Base de datos para la funcion
-#' @param var Variable para grÃ¡fico donut
+#' @param var Variable para gráfico donut
 #' @import tidyverse
 #' @import glue
 #' @import sjlabelled
